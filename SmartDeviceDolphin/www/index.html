@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        <meta name="color-scheme" content="light dark">
+        <link rel="stylesheet" href="css/index.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" 
+        integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+        <title>Попис</title>
+    </head>
+    <body>
+        <div class="navbar navbar-fixed-top">
+            <div class="dropdown">
+              <button id="menuToShow" class="dropbtn" onclick="showDialog()">Мени 
+                <i class="fa fa-caret-down"></i>
+              </button>
+            </div> 
+          </div>
+          <div class="container">
+            <div class="row card-container" id="homePage">
+                <div class="col card">
+                    <div class="card-content">
+                        <h3>Основни Сретства</h1>
+                        <hr/>
+                        <form>
+                            <label>Баркод / Шифра на Сретства:</label> 
+                                <input class="form-control" type="text" name="barkod" id="barkod" />
+                        </form>
+                            <div>
+                                <button class="btn btn-primary" id="btnScan">Скенирај</button>
+                                <button class="btn btn-info" id="btnSearch">Пребарај</button>
+                            </div>
+                        <div id="result"></div><br><br>
+                        <div>
+                            <button disabled class="btn btn-info" id="btnConfirm">Внеси во попис / Потврди</button></div><br><br>
+                        </div>
+                        <hr/>
+                        <div>
+                            <button disabled class="btn btn-warning btn-lg btn-block" id="btnInsertNew" onclick="customdDialogIsert()">Внеси во попис нов</button>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <div>
+                <div id="custom-dialog" style="display: none;">
+                    <button id="btnLoad" class="btn btn-primary btn-lg btn-block">Вчитај фајл со средства од диск</button><br>
+                    <button id="btnReview"  class="btn btn-primary  btn-lg btn-block">Прегледи</button><br>
+                    <button  id="btnReset"  class="btn btn-primary  btn-lg btn-block">Ресетирај попис на ново</button><br>
+                    <button id="btnSaveOnDisk"  class="btn btn-primary  btn-lg btn-block">Запиши попис на диск</button><br>
+                    <button id="btnSretstva"  class="btn btn-primary  btn-lg btn-block">Основни Сретства</button><br>
+                    <button id="btnClose"  class="btn btn-primary  btn-lg btn-block">Излез</button><br>
+                </div>
+            </div>
+            <div>
+                <div id="custom-dialogIsert" style="display: none;">
+                    <h3>Внес на ново сретство</h3>
+                    <label>Артикл Шифра:</label>
+                    <input class="form-control" type="text" name="shifra" />
+                    <label>Назив</label>
+                    <textarea id="naziv" class="form-control"></textarea><br>
+                    <button class="btn btn-primary" onclick="InsertNew()">Внеси во попис како ново</button>
+                    <button class="btn btn-danger" onclick="insertClose()">Излез</button>
+                </div>
+            </div>
+            <div class="row card-container" id="Reviews" style="display: none;">
+                <div class="col card">
+                    <div class="card-content">
+                    <h3>Преглед - Пописна Листа</h1>
+                    <hr/>
+                    <div class="table-responsive" style=" height:400px;overflow:auto;">
+                    <table class="table table-striped" id="productsTable">
+                    <thead>
+                    <tr>
+                        <th>Шифра</th>
+                        <th>Назив</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="files"></div>
+         </div>
+    </div>
+</div> 
+</div>
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+        <script src="cordova.js"></script>
+        <script src="js/index.js"></script>
+        <script>
+            var customDialog = document.getElementById('custom-dialog');
+            var btnLoad = document.getElementById('btnLoad');
+            var btnReview = document.getElementById('btnReview');
+            var btnReset = document.getElementById('btnReset');
+            var btnSaveOnDisk = document.getElementById('btnSaveOnDisk');
+            var btnSretstva = document.getElementById('btnSretstva');
+            var btnClose = document.getElementById('btnClose');
+            var customdDialogIsertNew = document.getElementById("custom-dialogIsert");
+    
+            
+            btnLoad.addEventListener('click', function() {
+                customDialog.style.display = 'none';
+            });
+            
+            btnReview.addEventListener('click', function() {
+                customDialog.style.display = 'none';
+                document.getElementById("Reviews").style.display = "block";
+                document.getElementById("homePage").style.display = "none";
+                displayProducts();
+            });
+
+            btnClose.addEventListener('click', function() {
+                customDialog.style.display = 'none';
+            });
+
+            btnSaveOnDisk.addEventListener('click', function() {
+                customDialog.style.display = 'none';
+            });
+
+            btnReset.addEventListener('click', function() {
+                customDialog.style.display = 'none';
+            });
+
+            btnSretstva.addEventListener('click', function() {
+                customDialog.style.display = 'none';
+                document.getElementById("homePage").style.display = "block";
+                document.getElementById("Reviews").style.display = "none";
+            });
+
+            
+            function showDialog() {
+                customDialog.style.display = 'block';
+            }
+
+            function customdDialogIsert(){
+                document.getElementById("menuToShow").style.display = "none";
+                customdDialogIsertNew.style.display = "block";
+            }
+
+            
+        </script>
+    </body>
+</html>

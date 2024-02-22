@@ -1,0 +1,42 @@
+{
+  "name": "com.smartdevicedolphin",
+  "displayName": "SmartDeviceDolphin",
+  "version": "1.0.0",
+  "description": "A sample Apache Cordova application that responds to the deviceready event.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Apache Cordova Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@red-mobile/cordova-plugin-barcodescanner": "^9.1.0",
+    "cordova-android": "^12.0.1",
+    "cordova-plugin-barcodescanner": "^0.7.4",
+    "cordova-plugin-compat": "^1.2.0",
+    "cordova-plugin-dialogs": "^2.0.2",
+    "cordova-plugin-file": "^8.0.1",
+    "cordova-plugin-inappbrowser": "^6.0.0",
+    "phonegap-plugin-barcodescanner": "^8.1.0"
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {
+      "phonegap-plugin-barcodescanner": {
+        "ANDROID_SUPPORT_V4_VERSION": "27.+"
+      },
+      "cordova-plugin-dialogs": {},
+      "cordova-plugin-inappbrowser": {},
+      "cordova-plugin-barcodescanner": {},
+      "@red-mobile/cordova-plugin-barcodescanner": {},
+      "cordova-plugin-file": {
+        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+      }
+    }
+  }
+}
