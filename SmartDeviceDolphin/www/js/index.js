@@ -27,7 +27,7 @@ var newProductArray = [];
 
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
-    readFileFromInternalStorage()
+    // readFileFromInternalStorage()
     btnScanner();  
     searchBtn();
     btnConfirm()  
@@ -50,7 +50,6 @@ function scan(){
                     // if(result.format == "QR_CODE")
                     // {
                        var value = result.text;
-                        
                        productExists(value);
                     // }
                 }
@@ -62,7 +61,11 @@ function scan(){
 
  function productExists(value){
     globalThis.ValueToConfirm = "";
-    if(globalThis.products.filter(p=>p.barcode==value)!=""){
+    if(globalThis.products.length<=0){
+        document.getElementById('result').innerHTML = `<p style='color:red'>Немате 
+        Вчитано листа на основни сретства пред да започнете со попис морате да вчитате
+        шифра шифри на основни сретства</p>`;
+    }else if(globalThis.products.filter(p=>p.barcode==value)!=""){
         if(globalThis.newProductArray.filter(p=>p.barcode==value)!="")
         {
             document.getElementById('result').innerHTML = `<p style='color:blue'>Ова основно средство е веќе 
@@ -106,7 +109,6 @@ function Search(){
 function readFileFromInternalStorage() {
     window.resolveLocalFileSystemURL(cordova.file.applicationDirectory
      + "www/Popis_Shifrarnik_2021.txt",function(fileEntry){
-        // alert(cordova.file.applicationDirectory);
         fileEntry.file(function (file) {
             var reader = new FileReader();
             reader.onloadend = function () {
@@ -118,8 +120,8 @@ function readFileFromInternalStorage() {
                     line = line.split(";");
                     if(line[2]!=undefined){
                     globalThis.products.push({
-                        code: line[0].replace(/\D/g, ''),
-                        barcode: line[1].replace(/\D/g, ''),
+                        code: line[0],
+                        barcode: line[1],
                         name: line[2]
                     });
                 }
@@ -133,8 +135,10 @@ function readFileFromInternalStorage() {
      });
 }
 function displayProducts(){
+    if(globalThis.products.length>0){
     document.querySelector("#productsTable tbody").innerHTML = globalThis.products.map(product =>
     `<tr><td>${product.code}</td><td>${product.name}</td></tr>`).join('');
+    }
 }
 
 function btnConfirm(){
@@ -216,5 +220,38 @@ document.getElementById('btnReset').addEventListener('click', function() {
     document.getElementById('result').innerText = "";
     document.getElementById('custom-dialog').style.display = 'none';
 });
+
+
+function fileWithOpener(){
+    globalThis.products=[];
+    window.fileChooser.open(function(uri) {
+        window.resolveLocalFileSystemURI(uri, function(fileEntry){
+            fileEntry.file(function(file){
+                var reader = new FileReader();
+                reader.onloadend = function () {
+                    var content = this.result;
+                    var lines = content.split('\n');
+                    lines.forEach(function (line) {
+                        line = line.split(";");
+                        if(line[2]!=undefined){
+                        globalThis.products.push({
+                            code: line[0],
+                            barcode: line[1],
+                            name: line[2]
+                         });
+                    }
+                    });
+                };
+                reader.readAsText(file);
+            }, function(error){
+                alert(error);
+            })
+        }, function(error){
+            alert(error)
+        }, function(){
+            alert(error)
+        });
+     })
+    }
 
 

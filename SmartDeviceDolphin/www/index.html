@@ -123,7 +123,8 @@
     
             
             btnLoad.addEventListener('click', function() {
-                customDialog.style.display = 'none';
+              fileWithOpener()
+              customDialog.style.display = 'none';
             });
             
             btnReview.addEventListener('click', function() {
@@ -138,8 +139,23 @@
             });
 
             btnSaveOnDisk.addEventListener('click', function() {
-                customDialog.style.display = 'none';
-            });
+                fileChooser.open(function(uri) {
+                    window.resolveLocalFileSystemURL(uri, function(directoryEntry) {
+                        directoryEntry.getFile("results.txt", {create: true}, function(fileEntry) {
+                            fileEntry.createWriter(function(fileWriter) {
+                                var arrayContent = ["Line 1", "Line 2", "Line 3"];
+                                var content = arrayContent.join("\n");
+                                fileWriter.write(content);
+                                alert("File saved successfully!"); 
+                            },errorHandler)
+                    },errorHandler)
+                },errorHandler)
+            },errorHandler);
+            customDialog.style.display = 'none';
+        });
+        function errorHandler(error) {
+            alert('Error: ' + error.message);
+        }
 
             btnSretstva.addEventListener('click', function() {
                 customDialog.style.display = 'none';
