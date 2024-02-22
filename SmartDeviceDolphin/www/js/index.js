@@ -107,6 +107,7 @@ function Search(){
 
 
 function readFileFromInternalStorage() {
+    globalThis.products=[];
     window.resolveLocalFileSystemURL(cordova.file.applicationDirectory
      + "www/Popis_Shifrarnik_2021.txt",function(fileEntry){
         fileEntry.file(function (file) {
@@ -152,8 +153,10 @@ function Confirm(){
         document.getElementById('btnConfirm').disabled = true;
         document.getElementById("btnInsertNew").disabled = true;
         document.getElementById('result').innerText = "";
-        document.getElementById('result').innerHTML = `<p style='color:green'>Пронајдено, ${globalThis.ValueToConfirm} спајалици<br>
-        -> Основното средство е внесено во новиот попис</p>`;
+        document.getElementById('result').innerHTML = `<p style='color:green'>Пронајдено, ${globalThis.ValueToConfirm}
+        ${globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
+            return p.name;
+        })}<br>-> Основното средство е внесено во новиот попис</p>`;
 
         globalThis.newProductArray.push({
             code: globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
@@ -217,7 +220,9 @@ function insertClose(){
 }
 
 document.getElementById('btnReset').addEventListener('click', function() {
+    if(confirm("Дали навистина сакате да го ресетирате фајлот за попис и да започнете на ново") == true) {
     globalThis.newProductArray = [];
+    }
     document.getElementById('result').innerText = "";
     document.getElementById('custom-dialog').style.display = 'none';
 });
@@ -228,7 +233,7 @@ function fileWithOpener(){
     window.fileChooser.open(function(uri) {
         window.resolveLocalFileSystemURI(uri, function(fileEntry){
             fileEntry.file(function(file){
-                if(file.type === "text/plain")
+                    if(file.type === "text/plain")
                 {
                     var reader = new FileReader();
                     reader.onloadend = function () {

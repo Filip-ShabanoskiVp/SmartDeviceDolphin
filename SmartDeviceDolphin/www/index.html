@@ -139,23 +139,70 @@
             });
 
             btnSaveOnDisk.addEventListener('click', function() {
-                fileChooser.open(function(uri) {
-                    window.resolveLocalFileSystemURL(uri, function(directoryEntry) {
-                        directoryEntry.getFile("results.txt", {create: true}, function(fileEntry) {
-                            fileEntry.createWriter(function(fileWriter) {
-                                var arrayContent = ["Line 1", "Line 2", "Line 3"];
-                                var content = arrayContent.join("\n");
-                                fileWriter.write(content);
-                                alert("File saved successfully!"); 
-                            },errorHandler)
-                    },errorHandler)
-                },errorHandler)
-            },errorHandler);
-            customDialog.style.display = 'none';
+                writeFile();
+                customDialog.style.display = 'none';
         });
-        function errorHandler(error) {
-            alert('Error: ' + error.message);
-        }
+
+
+
+        function writeFile(){
+             // Resolve the application directory
+             alert(1);
+             window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(dirEntry) {
+                // Use directory chooser to select a directory
+                alert(2)
+                window.plugins.intentShim.startActivityForResult({
+                    action: window.plugins.intentShim.ACTION_OPEN_DOCUMENT_TREE
+                }, function(intent) {
+                    // Get selected directory URI
+                    var uri = intent.data;
+        
+                    // Resolve the selected directory
+                    alert(3)
+                    window.resolveLocalFileSystemURL(uri, function(selectedDirEntry) {
+                        // Create a new file in the selected directory
+                        alert(4);
+                        selectedDirEntry.getFile("results.txt", { create: true, exclusive: false }, function(fileEntry) {
+                            // Create a FileWriter object to write into the file
+                            alert(5);
+                            fileEntry.createWriter(function(fileWriter) {
+                                alert(7)
+                                fileWriter.onwriteend = function() {
+                                    alert(8)
+                                    console.log("Write successful.");
+                                };
+        
+                                fileWriter.onerror = function(err) {
+                                    console.error("Write failed: " + err);
+                                };
+                                alert(6)
+                                // Convert array data to string
+                                var arrayContent = ["Line 1", "Line 2", "Line 3"];
+                                var dataString = JSON.stringify(arrayContent);
+        
+                                // Create a Blob containing the data
+                                var blob = new Blob([dataString], { type: 'text/plain' });
+        
+                                // Write the data to the file
+                                fileWriter.write(blob);
+                            }, function(err) {
+                                console.error("Error creating file writer: " + err);
+                            });
+                        }, function(err) {
+                            console.error("Error creating file: " + err);
+                        });
+                    }, function(err) {
+                        console.error("Error resolving directory: " + err);
+                    });
+                }, function() {
+                    console.error('Error starting directory chooser.');
+                });
+            }, function(err) {
+                console.error("Error resolving data directory: " + err);
+            });
+    customDialog.style.display = 'none';
+}
+
 
             btnSretstva.addEventListener('click', function() {
                 customDialog.style.display = 'none';
