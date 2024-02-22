@@ -68,7 +68,7 @@
                 <div id="custom-dialog" style="display: none;">
                     <button id="btnLoad" class="btn btn-primary btn-lg btn-block">Вчитај фајл со средства од диск</button><br>
                     <button id="btnReview"  class="btn btn-primary  btn-lg btn-block">Прегледи</button><br>
-                    <button  id="btnReset"  class="btn btn-primary  btn-lg btn-block">Ресетирај попис на ново</button><br>
+                    <button id="btnReset"  class="btn btn-primary  btn-lg btn-block">Ресетирај попис на ново</button><br>
                     <button id="btnSaveOnDisk"  class="btn btn-primary  btn-lg btn-block">Запиши попис на диск</button><br>
                     <button id="btnSretstva"  class="btn btn-primary  btn-lg btn-block">Основни Сретства</button><br>
                     <button id="btnClose"  class="btn btn-primary  btn-lg btn-block">Излез</button><br>
@@ -78,7 +78,7 @@
                 <div id="custom-dialogIsert" style="display: none;">
                     <h3>Внес на ново сретство</h3>
                     <label>Артикл Шифра:</label>
-                    <input class="form-control" type="text" name="shifra" />
+                    <input class="form-control" type="text" name="shifra"  id="shifra"/>
                     <label>Назив</label>
                     <textarea id="naziv" class="form-control"></textarea><br>
                     <button class="btn btn-primary" onclick="InsertNew()">Внеси во попис како ново</button>
@@ -138,10 +138,6 @@
             });
 
             btnSaveOnDisk.addEventListener('click', function() {
-                customDialog.style.display = 'none';
-            });
-
-            btnReset.addEventListener('click', function() {
                 customDialog.style.display = 'none';
             });
 

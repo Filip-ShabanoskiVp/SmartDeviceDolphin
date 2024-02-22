@@ -63,7 +63,6 @@ function scan(){
  function productExists(value){
     globalThis.ValueToConfirm = "";
     if(globalThis.products.filter(p=>p.barcode==value)!=""){
-        alert(globalThis.newProductArray.filter(p=>p.barcode==value)!="");
         if(globalThis.newProductArray.filter(p=>p.barcode==value)!="")
         {
             document.getElementById('result').innerHTML = `<p style='color:blue'>Ова основно средство е веќе 
@@ -145,7 +144,6 @@ function btnConfirm(){
 
 function Confirm(){
     if(globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm)!=""){
-        alert( globalThis.newProductArray.length);
         document.getElementById('btnConfirm').disabled = true;
         document.getElementById("btnInsertNew").disabled = true;
         document.getElementById('result').innerText = "";
@@ -161,39 +159,62 @@ function Confirm(){
                 return p.name;
             })
         });
+        alert(globalThis.newProductArray.length);
         globalThis.ValueToConfirm = "";
     }
 }
 
-function InsertNew()
-            {
-                var naziv = document.getElementById('naziv').value;
-                if(naziv=="")
-                {
-                    alert("Мора да внесете назив на основното средство");
-                    document.getElementById("menuToShow").style.display = "none";
-                }else {
-                    var barcodeNew = document.getElementById('shifra').value;
-                    document.getElementById('btnConfirm').disabled = true;
-                    document.getElementById("btnInsertNew").disabled = true;
-                    document.getElementById('result').innerText = "";
-                    document.getElementById('result').innerHTML = `<p style='color:orange'>Додадено, ${barcodeNew} Disk<br>
-                    -> Основното средство е додадено во новиот диск</p>`;
-                    globalThis.newProductArray.push({
-                        code: barcodeNew,
-                        barcode: barcodeNew,
-                        name: naziv
-                        });
-                    barcodeNew = "";
-                    naziv = ""
-                    document.getElementById("custom-dialogIsert").style.display = "none";
-                    document.getElementById("menuToShow").style.display = "block";
-                }
-            }
+function InsertNew(){
+    var naziv = document.getElementById('naziv').value;
+    var barcodeNew = document.getElementById('shifra').value;
+    if(naziv=="")
+    {
+        alert("Мора да внесете назив на основното средство");
+        document.getElementById("menuToShow").style.display = "none";
+    } else if(barcodeNew==""){
+        alert("Мора да внесете шифра на основното средство");
+        document.getElementById("menuToShow").style.display = "none"; 
+    }else {
 
-            function insertClose()
-            {
-                document.getElementById("custom-dialogIsert").style.display = "none";  
-                document.getElementById("menuToShow").style.display = "block";
-            }
+                // alert(globalThis.newProductArray.filter(p=>p.barcode==barcodeNew)!="");
+        if(globalThis.newProductArray.filter(p=>p.barcode==barcodeNew)!=""){
+            document.getElementById('result').innerHTML = `<p style='color:blue'>Ова основно средство е веќе 
+            внесено во попис, не може да се повторуваат средствата!</p>`;  
+            document.getElementById('btnConfirm').disabled = true;
+            document.getElementById("btnInsertNew").disabled = true;
+
+            document.getElementById("custom-dialogIsert").style.display = "none";
+            document.getElementById("menuToShow").style.display = "block"; 
+        }else {
+            alert(globalThis.newProductArray.length);
+            document.getElementById('btnConfirm').disabled = true;
+            document.getElementById("btnInsertNew").disabled = true;
+            document.getElementById('result').innerText = "";
+            document.getElementById('result').innerHTML = `<p style='color:orange'>Додадено, ${barcodeNew} Disk<br>
+            -> Основното средство е додадено во новиот диск</p>`;
+            
+            globalThis.newProductArray.push({
+                code: barcodeNew,
+                barcode: barcodeNew,
+                name: naziv
+                });
+            barcodeNew = "";
+            naziv = ""
+            document.getElementById("custom-dialogIsert").style.display = "none";
+            document.getElementById("menuToShow").style.display = "block";
+        }
+    }
+}
+
+function insertClose(){
+    document.getElementById("custom-dialogIsert").style.display = "none";  
+    document.getElementById("menuToShow").style.display = "block";
+}
+
+document.getElementById('btnReset').addEventListener('click', function() {
+    globalThis.newProductArray = [];
+    document.getElementById('result').innerText = "";
+    document.getElementById('custom-dialog').style.display = 'none';
+});
+
 
