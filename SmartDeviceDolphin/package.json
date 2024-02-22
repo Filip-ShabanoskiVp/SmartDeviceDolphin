@@ -16,12 +16,15 @@
     "@red-mobile/cordova-plugin-barcodescanner": "^9.1.0",
     "android": "^0.0.8",
     "com-darryncampbell-cordova-plugin-intent": "^2.2.0",
+    "cordova": "^12.0.0",
     "cordova-android": "^12.0.1",
     "cordova-plugin-barcodescanner": "^0.7.4",
     "cordova-plugin-compat": "^1.2.0",
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-file": "^8.0.1",
     "cordova-plugin-filechooser": "^1.2.0",
+    "cordova-plugin-filepath": "^1.6.0",
+    "cordova-plugin-filepicker": "^1.1.6",
     "cordova-plugin-inappbrowser": "^6.0.0",
     "phonegap-plugin-barcodescanner": "^8.1.0"
   },
@@ -39,7 +42,9 @@
       "@red-mobile/cordova-plugin-barcodescanner": {},
       "cordova-plugin-file": {},
       "cordova-plugin-filechooser": {},
-      "com-darryncampbell-cordova-plugin-intent": {}
+      "com-darryncampbell-cordova-plugin-intent": {},
+      "cordova-plugin-filepicker": {},
+      "cordova-plugin-filepath": {}
     }
   }
 }

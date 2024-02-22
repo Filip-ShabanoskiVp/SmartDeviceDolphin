@@ -28,10 +28,13 @@ var newProductArray = [];
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
     // readFileFromInternalStorage()
+
     btnScanner();  
     searchBtn();
     btnConfirm()  
+    
 }
+
 
 function btnScanner(){
     let btn = document.getElementById('btnScan');
@@ -263,4 +266,49 @@ function fileWithOpener(){
      })
     }
 
+    document.getElementById('btnSaveOnDisk').addEventListener('click', function() {
+        if(globalThis.newProductArray.length>0){
+            writeFile();
+        }else{
+            alert("Немате внесено во попис нов или немате вчитано фајл со средства од диск");
+        }
+        document.getElementById('custom-dialog').style.display = 'none';
+});
 
+
+
+function writeFile(){
+    window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory, function(directoryEntry) {
+        // alert(directoryEntry.toURL());
+
+        directoryEntry.getFile("result.txt", { create: true }, function(fileEntry) {
+            fileEntry.createWriter(function(fileWriter) {
+               // fileWriter.onwriteend = function() {
+                 //   alert("File saved successfully.");
+               // };
+
+              //  fileWriter.onerror = function(e) {
+              //      alert("Failed to save file.");
+              //  };
+              var lines = [];
+              globalThis.newProductArray.forEach(function(line){
+            //    alert((line.code+";"+line.barcode+";"+line.name).toString());
+                lines.push((line.code+";"+line.barcode+";"+line.name).toString())
+              });
+              var data = lines.join('\n');
+              alert(data);
+
+                var blob = new Blob([data], { type: 'text/plain' });
+                fileWriter.write(blob);
+                alert("Успешно креиран фајл");
+                globalThis.newProductArray = [];
+            }, function() {
+                alert("Error creating file writer.");
+            });
+        }, function() {
+            alert("Error creating file.");
+        });
+    }, function() {
+        alert("Error resolving file system URL.");
+    });
+}
