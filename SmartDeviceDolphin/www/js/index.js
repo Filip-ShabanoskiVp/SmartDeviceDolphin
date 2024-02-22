@@ -110,25 +110,26 @@ function readFileFromInternalStorage() {
     window.resolveLocalFileSystemURL(cordova.file.applicationDirectory
      + "www/Popis_Shifrarnik_2021.txt",function(fileEntry){
         fileEntry.file(function (file) {
-            var reader = new FileReader();
-            reader.onloadend = function () {
-
-                var content = this.result;
-                var lines = content.split('\n');
-                
-                lines.forEach(function (line) {
-                    line = line.split(";");
-                    if(line[2]!=undefined){
-                    globalThis.products.push({
-                        code: line[0],
-                        barcode: line[1],
-                        name: line[2]
+            if(file.type === "text/plain"){
+                var reader = new FileReader();
+                reader.onloadend = function () {
+    
+                    var content = this.result;
+                    var lines = content.split('\n');
+                    
+                    lines.forEach(function (line) {
+                        line = line.split(";");
+                        if(line[2]!=undefined){
+                        globalThis.products.push({
+                            code: line[0],
+                            barcode: line[1],
+                            name: line[2]
+                        });
+                    }
                     });
-                }
-
-                });
-            };
-            reader.readAsText(file);
+                };
+                reader.readAsText(file);
+            }
         })
      }, function(error){
         console.error(error);
@@ -227,21 +228,24 @@ function fileWithOpener(){
     window.fileChooser.open(function(uri) {
         window.resolveLocalFileSystemURI(uri, function(fileEntry){
             fileEntry.file(function(file){
-                var reader = new FileReader();
-                reader.onloadend = function () {
-                    var content = this.result;
-                    var lines = content.split('\n');
-                    lines.forEach(function (line) {
-                        line = line.split(";");
-                        if(line[2]!=undefined){
-                        globalThis.products.push({
-                            code: line[0],
-                            barcode: line[1],
-                            name: line[2]
-                         });
-                    }
-                    });
-                };
+                if(file.type === "text/plain")
+                {
+                    var reader = new FileReader();
+                    reader.onloadend = function () {
+                        var content = this.result;
+                        var lines = content.split('\n');
+                        lines.forEach(function (line) {
+                            line = line.split(";");
+                            if(line[2]!=undefined){
+                            globalThis.products.push({
+                                code: line[0],
+                                barcode: line[1],
+                                name: line[2]
+                             });
+                        }
+                        });
+                    };
+                }
                 reader.readAsText(file);
             }, function(error){
                 alert(error);
