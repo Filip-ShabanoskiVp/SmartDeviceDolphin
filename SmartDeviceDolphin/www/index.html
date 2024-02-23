@@ -20,27 +20,30 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://maxcdn.bootstrapcdn.com;
+        ;script-src 'self' 'unsafe-eval' 'unsafe-inline' https://ssl.gstatic.com;media-src *;script-src 'self' 'unsafe-eval' https://code.jquery.com 'unsafe-inline';
+         img-src 'self' data: content:;">
         <meta name="format-detection" content="telephone=no">
         <meta name="msapplication-tap-highlight" content="no">
         <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
         <meta name="color-scheme" content="light dark">
+        <link rel="icon" href="favicon.ico" type="image/x-icon">
         <link rel="stylesheet" href="css/index.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" 
-        integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+        integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous"> 
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
         <title>Попис</title>
     </head>
     <body>
         <div class="navbar navbar-fixed-top">
             <div class="dropdown">
-              <button id="menuToShow" class="dropbtn" onclick="showDialog()">Мени 
+              <button id="menuToShow" class="dropbtn">Мени 
                 <i class="fa fa-caret-down"></i>
               </button>
             </div> 
           </div>
           <div class="container">
-            <div class="row card-container" id="homePage">
+            <div class="row card-container" style="display: block;position:relative;right:22px" id="homePage">
                 <div class="col card">
                     <div class="card-content">
                         <h3>Основни Сретства</h1>
@@ -49,17 +52,17 @@
                             <label>Баркод / Шифра на Сретства:</label> 
                                 <input class="form-control" type="text" name="barkod" id="barkod" />
                         </form>
-                            <div>
+                            <div style="margin-top: 10px;">
                                 <button class="btn btn-primary" id="btnScan">Скенирај</button>
                                 <button class="btn btn-info" id="btnSearch">Пребарај</button>
                             </div>
                         <div id="result"></div><br><br>
                         <div>
-                            <button disabled class="btn btn-info" id="btnConfirm">Внеси во попис / Потврди</button></div><br><br>
+                            <button disabled class="btn btn-info" style="opacity: 0.5;" id="btnConfirm">Внеси во попис / Потврди</button></div><br><br>
                         </div>
                         <hr/>
                         <div>
-                            <button disabled class="btn btn-warning btn-lg btn-block" id="btnInsertNew" onclick="customdDialogIsert()">Внеси во попис нов</button>
+                            <button disabled style="opacity: 0.5;" class="btn btn-warning btn-lg btn-block" id="btnInsertNew">Внеси во попис нов</button>
                         </div>
                     </div>
                 </div>
@@ -81,11 +84,67 @@
                     <input class="form-control" type="text" name="shifra"  id="shifra"/>
                     <label>Назив</label>
                     <textarea id="naziv" class="form-control"></textarea><br>
-                    <button class="btn btn-primary" onclick="InsertNew()">Внеси во попис како ново</button>
-                    <button class="btn btn-danger" onclick="insertClose()">Излез</button>
+                    <button class="btn btn-primary" id="insertNew">Внеси во попис како ново</button>
+                    <button style="margin-top: 5px;" id="insertClose" class="btn btn-danger">Излез</button>
+                </div>
+                <div id="alertNaziv" style="display: none;position: absolute;z-index: 15;top: 35%;
+             left: 50%; margin: -100px 0 0 -150px;">
+             <div class="card-container" style="width: 300px;">
+                <div class="col card">
+                    <div class="card-content">
+                          <p>Мора да внесете назив на основното средство</p>
+                          <button class="btn btn-primary" id="closeNaziv">Close</button>
+                    </div>
+                </div>
+             </div>
+             </div>
+                <div id="alertShifra" style="display: none;position: absolute;z-index: 15;top: 35%;
+                left: 50%; margin: -100px 0 0 -150px;">
+                <div class="card-container" style="width: 300px;">
+                    <div class="col card">
+                        <div class="card-content">
+                            <p>Мора да внесете шифра на основното средство</p>
+                            <button class="btn btn-primary" id="closeShifra">Close</button>
+                        </div>
+                    </div>
+                </div>
                 </div>
             </div>
-            <div class="row card-container" id="Reviews" style="display: none;">
+            <div id="confirmAlert" style="display: none;position: absolute;z-index: 15;top: 35%;
+            left: 50%; margin: -100px 0 0 -150px;">
+            <div class="card-container" style="width: 300px;">
+                <div class="col card">
+                    <div class="card-content">
+                        <p>Дали навистина сакате да го ресетирате фајлот за попис и да започнете на ново</p>
+                        <button class="btn btn-primary" id="btnYes">Да</button>
+                        <button class="btn btn-primary" id="btnNo">Не</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div id="alertError" style="display: none;position: absolute;z-index: 15;top: 35%;
+            left: 50%; margin: -100px 0 0 -150px;">
+            <div class="card-container" style="width: 300px;">
+                <div class="col card">
+                    <div class="card-content">
+                        <p>Немате внесено во попис нов или немате вчитано фајл со средства од диск</p>
+                        <button class="btn btn-primary" id="closeError">Close</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div id="alertScanner" style="display: none;position: absolute;z-index: 15;top: 35%;
+            left: 50%; margin: -100px 0 0 -150px;">
+            <div class="card-container" style="width: 300px;">
+                <div class="col card">
+                    <div class="card-content">
+                        <p>Неуспешно скенирање: Не легален пристап</p>
+                        <button class="btn btn-primary" id="closeScanError">Close</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="row card-container" id="Reviews" style="display: none;position:relative;right:5px">
                 <div class="col card">
                     <div class="card-content">
                     <h3>Преглед - Пописна Листа</h1>
@@ -101,7 +160,7 @@
                     <tbody>
                     </tbody>
                 </table>
-            </div>
+            </div>  
             <div id="files"></div>
          </div>
     </div>
@@ -123,8 +182,10 @@
     
             
             btnLoad.addEventListener('click', function() {
-              fileWithOpener()
-              customDialog.style.display = 'none';
+              fileWithOpener();
+              document.getElementById("Reviews").style.display = "none";
+              document.getElementById("homePage").style.display = "block";
+              document.getElementById("custom-dialog").style.display = "none";
             });
             
             btnReview.addEventListener('click', function() {
@@ -146,14 +207,17 @@
             });
 
             
-            function showDialog() {
+            function showDiafileWithOplog() {
                 customDialog.style.display = 'block';
             }
-
-            function customdDialogIsert(){
+            document.getElementById("btnInsertNew").addEventListener('click', function() {
                 document.getElementById("menuToShow").style.display = "none";
                 customdDialogIsertNew.style.display = "block";
-            }
+            });
+
+            document.getElementById('menuToShow').addEventListener('click', function() {
+                document.getElementById('custom-dialog').style.display = 'block';
+            });
 
             
         </script>

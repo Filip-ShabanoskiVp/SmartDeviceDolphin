@@ -56,18 +56,31 @@ function scan(){
                        productExists(value);
                     // }
                 }
-            }, function (error) {
-                alert("Scanning failed: " + error);
+            }, function () {
+        document.getElementById("alertScanner").style.display = "block";
+        document.getElementById("menuToShow").style.display = "none";
+        document.getElementById("homePage").style.display = "none";
             }
     );  
  }
+
+document.getElementById('closeScanError').addEventListener('click',function(){
+
+    document.getElementById("alertScanner").style.display = "none";
+    document.getElementById("menuToShow").style.display = "block";
+    document.getElementById("homePage").style.display = "block";
+},false)
+
+
+
+
 
  function productExists(value){
     globalThis.ValueToConfirm = "";
     if(globalThis.products.length<=0){
         document.getElementById('result').innerHTML = `<p style='color:red'>Немате 
-        Вчитано листа на основни сретства пред да започнете со попис морате да вчитате
-        шифра шифри на основни сретства</p>`;
+        вчитано листа на основни сретства, пред да започнете со попис морате да вчитате
+        шифри на основни сретства !</p>`;
     }else if(globalThis.products.filter(p=>p.barcode==value)!=""){
         if(globalThis.newProductArray.filter(p=>p.barcode==value)!="")
         {
@@ -77,15 +90,20 @@ function scan(){
         }
         globalThis.ValueToConfirm = value;
         document.getElementById('btnConfirm').disabled = false;  
-        document.getElementById("btnInsertNew").disabled = true;       
+        document.getElementById('btnConfirm').style.opacity = 1;
+        document.getElementById("btnInsertNew").disabled = true;   
+        document.getElementById("btnInsertNew").style.opacity = 0.5;    
         document.getElementById('result').innerHTML = "Пронајдено, " + value +"<br/>" 
         + globalThis.products.filter(p=>p.barcode==value).map(function(p){
             return p.name;
         });
     }else {
         globalThis.ValueToConfirm = "";
+        document.getElementById('shifra').value = value;
         document.getElementById('btnConfirm').disabled = true;
         document.getElementById("btnInsertNew").disabled = false;
+        document.getElementById("btnInsertNew").style.opacity = 1;
+        document.getElementById("btnConfirm").style.opacity = 0.5;
         document.getElementById('result').innerHTML = "<p style='color:red'>Основнот средство, " + value +
          ", не е пронајдено или не постои. Побарајте консултација, или внесете го како ново !</p>"
     }
@@ -106,6 +124,7 @@ function Search(){
     }else{
         document.getElementById('result').innerText = "";
     }
+    document.getElementById('barkod').value = ""
 }
 
 
@@ -141,6 +160,7 @@ function readFileFromInternalStorage() {
 }
 function displayProducts(){
     if(globalThis.products.length>0){
+
     document.querySelector("#productsTable tbody").innerHTML = globalThis.products.map(product =>
     `<tr><td>${product.code}</td><td>${product.name}</td></tr>`).join('');
     }
@@ -155,6 +175,8 @@ function Confirm(){
     if(globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm)!=""){
         document.getElementById('btnConfirm').disabled = true;
         document.getElementById("btnInsertNew").disabled = true;
+        document.getElementById('btnConfirm').style.opacity = 0.5;
+        document.getElementById("btnInsertNew").style.opacity = 0.5;
         document.getElementById('result').innerText = "";
         document.getElementById('result').innerHTML = `<p style='color:green'>Пронајдено, ${globalThis.ValueToConfirm}
         ${globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
@@ -170,66 +192,107 @@ function Confirm(){
                 return p.name;
             })
         });
-        alert(globalThis.newProductArray.length);
+        // alert(globalThis.newProductArray.length);
         globalThis.ValueToConfirm = "";
     }
 }
 
-function InsertNew(){
-    var naziv = document.getElementById('naziv').value;
-    var barcodeNew = document.getElementById('shifra').value;
-    if(naziv=="")
-    {
-        alert("Мора да внесете назив на основното средство");
-        document.getElementById("menuToShow").style.display = "none";
-    } else if(barcodeNew==""){
-        alert("Мора да внесете шифра на основното средство");
-        document.getElementById("menuToShow").style.display = "none"; 
-    }else {
+document.getElementById('closeNaziv').addEventListener('click',function(){
+    document.getElementById("alertNaziv").style.display = "none"; 
+    document.getElementById("menuToShow").style.display = "none"; 
+    document.getElementById("homePage").style.display = "block";
+    document.getElementById("custom-dialogIsert").style.display = "block"
+},false)
 
-                // alert(globalThis.newProductArray.filter(p=>p.barcode==barcodeNew)!="");
-        if(globalThis.newProductArray.filter(p=>p.barcode==barcodeNew)!=""){
-            document.getElementById('result').innerHTML = `<p style='color:blue'>Ова основно средство е веќе 
-            внесено во попис, не може да се повторуваат средствата!</p>`;  
-            document.getElementById('btnConfirm').disabled = true;
-            document.getElementById("btnInsertNew").disabled = true;
+document.getElementById('closeShifra').addEventListener('click',function(){
+    document.getElementById("alertShifra").style.display = "none"; 
+    document.getElementById("menuToShow").style.display = "none"; 
+    document.getElementById("homePage").style.display = "block";
+    document.getElementById("custom-dialogIsert").style.display = "block"
+},false)
 
+document.getElementById('insertNew').addEventListener('click',function(){
+        var naziv = document.getElementById('naziv').value;
+        var barcodeNew = document.getElementById('shifra').value;
+        if(naziv=="")
+        {
+            document.getElementById("alertNaziv").style.display = "block";
+            document.getElementById("menuToShow").style.display = "none";
+            document.getElementById("homePage").style.display = "none";
             document.getElementById("custom-dialogIsert").style.display = "none";
-            document.getElementById("menuToShow").style.display = "block"; 
+        } else if(barcodeNew==""){
+            document.getElementById("alertShifra").style.display = "block";
+            document.getElementById("menuToShow").style.display = "none"; 
+            document.getElementById("homePage").style.display = "none";
+            document.getElementById("custom-dialogIsert").style.display = "none"
         }else {
-            alert(globalThis.newProductArray.length);
-            document.getElementById('btnConfirm').disabled = true;
-            document.getElementById("btnInsertNew").disabled = true;
-            document.getElementById('result').innerText = "";
-            document.getElementById('result').innerHTML = `<p style='color:orange'>Додадено, ${barcodeNew} Disk<br>
-            -> Основното средство е додадено во новиот диск</p>`;
-            
-            globalThis.newProductArray.push({
-                code: barcodeNew,
-                barcode: barcodeNew,
-                name: naziv
-                });
-            barcodeNew = "";
-            naziv = ""
-            document.getElementById("custom-dialogIsert").style.display = "none";
-            document.getElementById("menuToShow").style.display = "block";
+    
+                    // alert(globalThis.newProductArray.filter(p=>p.barcode==barcodeNew)!="");
+            if(globalThis.newProductArray.filter(p=>p.barcode==barcodeNew)!=""){
+                document.getElementById('result').innerHTML = `<p style='color:blue'>Ова основно средство е веќе 
+                внесено во попис, не може да се повторуваат средствата!</p>`;  
+                document.getElementById('btnConfirm').disabled = true;
+                document.getElementById("btnInsertNew").disabled = true;
+    
+                document.getElementById('btnConfirm').style.opacity = 0.5;
+                document.getElementById("btnInsertNew").style.opacity = 0.5;
+    
+                document.getElementById('naziv').value="";
+                document.getElementById('shifra').value="";
+    
+                document.getElementById("custom-dialogIsert").style.display = "none";
+                document.getElementById("menuToShow").style.display = "block"; 
+            }else {
+                document.getElementById('btnConfirm').disabled = true;
+                document.getElementById("btnInsertNew").disabled = true;
+    
+                document.getElementById('btnConfirm').style.opacity = 0.5;
+                document.getElementById("btnInsertNew").style.opacity = 0.5;
+                document.getElementById('result').innerText = "";
+                document.getElementById('result').innerHTML = `<p style='color:orange'>Додадено, ${barcodeNew} Disk<br>
+                -> Основното средство е додадено во новиот диск</p>`;
+                
+                globalThis.newProductArray.push({
+                    code: barcodeNew,
+                    barcode: barcodeNew,
+                    name: naziv
+                    });
+                // alert(globalThis.newProductArray.length);
+                document.getElementById('naziv').value="";
+                document.getElementById('shifra').value="";
+    
+                document.getElementById("custom-dialogIsert").style.display = "none";
+                document.getElementById("menuToShow").style.display = "block";
+            }
         }
     }
-}
+    ,false);
 
-function insertClose(){
-    document.getElementById("custom-dialogIsert").style.display = "none";  
-    document.getElementById("menuToShow").style.display = "block";
-}
+    document.getElementById('insertClose').addEventListener('click',function(){
+        document.getElementById("custom-dialogIsert").style.display = "none";  
+        document.getElementById("menuToShow").style.display = "block";
+    },false);
 
 document.getElementById('btnReset').addEventListener('click', function() {
-    if(confirm("Дали навистина сакате да го ресетирате фајлот за попис и да започнете на ново") == true) {
-    globalThis.newProductArray = [];
-    }
-    document.getElementById('result').innerText = "";
-    document.getElementById('custom-dialog').style.display = 'none';
+    document.getElementById("custom-dialog").style.display = "none";
+    document.getElementById("menuToShow").style.display = "none";
+    document.getElementById("homePage").style.display = "none";
+    document.getElementById("confirmAlert").style.display = 'block';
 });
 
+document.getElementById('btnYes').addEventListener('click',function(){
+    globalThis.newProductArray = [];
+    document.getElementById('result').innerHTML = "<p style='color:green'>Нов попис е ресетиран!</p>";
+    document.getElementById("confirmAlert").style.display = 'none';
+    document.getElementById("menuToShow").style.display = "block";
+    document.getElementById("homePage").style.display = "block";
+    },false);
+ document.getElementById('btnNo').addEventListener('click',function(){
+        document.getElementById('result').innerText = "";
+        document.getElementById("confirmAlert").style.display = 'none';
+        document.getElementById("menuToShow").style.display = "block";
+        document.getElementById("homePage").style.display = "block";
+    },false);
 
 function fileWithOpener(){
     globalThis.products=[];
@@ -251,6 +314,8 @@ function fileWithOpener(){
                                 name: line[2]
                              });
                         }
+                        document.getElementById('result').innerHTML = 
+                        "<p style='color:green'>Успечно вчитан фајл од средства</p>";
                         });
                     };
                 }
@@ -269,11 +334,25 @@ function fileWithOpener(){
     document.getElementById('btnSaveOnDisk').addEventListener('click', function() {
         if(globalThis.newProductArray.length>0){
             writeFile();
+            document.getElementById('result').innerHTML = "<p style='color:green'>Успечно креиран фајл</p>";
+            document.getElementById("menuToShow").style.display = "block";
+            document.getElementById("homePage").style.display = "block";
+            document.getElementById("Reviews").style.display = "none";
+            document.getElementById('custom-dialog').style.display = 'none';
         }else{
-            alert("Немате внесено во попис нов или немате вчитано фајл со средства од диск");
+            document.getElementById("alertError").style.display = "block";
+            document.getElementById("menuToShow").style.display = "none";
+            document.getElementById("homePage").style.display = "none";
+            document.getElementById("Reviews").style.display = "none";
         }
         document.getElementById('custom-dialog').style.display = 'none';
-});
+        });
+        
+        document.getElementById('closeError').addEventListener('click',function(){
+            document.getElementById("alertError").style.display = "none";
+            document.getElementById("menuToShow").style.display = "block";
+            document.getElementById("homePage").style.display = "block";
+            },false);
 
 
 
@@ -296,11 +375,11 @@ function writeFile(){
                 lines.push((line.code+";"+line.barcode+";"+line.name).toString())
               });
               var data = lines.join('\n');
-              alert(data);
+            //   alert(data);
 
                 var blob = new Blob([data], { type: 'text/plain' });
                 fileWriter.write(blob);
-                alert("Успешно креиран фајл");
+                // alert("Успешно креиран фајл");
                 globalThis.newProductArray = [];
             }, function() {
                 alert("Error creating file writer.");
