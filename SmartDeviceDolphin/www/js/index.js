@@ -60,6 +60,7 @@ function scan(){
         document.getElementById("alertScanner").style.display = "block";
         document.getElementById("menuToShow").style.display = "none";
         document.getElementById("homePage").style.display = "none";
+        document.getElementById('myBody').style.backgroundColor = "#a6a6a6";
             }
     );  
  }
@@ -69,6 +70,7 @@ document.getElementById('closeScanError').addEventListener('click',function(){
     document.getElementById("alertScanner").style.display = "none";
     document.getElementById("menuToShow").style.display = "block";
     document.getElementById("homePage").style.display = "block";
+    document.getElementById('myBody').style.backgroundColor = "white";
 },false)
 
 
@@ -78,9 +80,12 @@ document.getElementById('closeScanError').addEventListener('click',function(){
  function productExists(value){
     globalThis.ValueToConfirm = "";
     if(globalThis.products.length<=0){
+
         document.getElementById('result').innerHTML = `<p style='color:red'>Немате 
         вчитано листа на основни сретства, пред да започнете со попис морате да вчитате
         шифри на основни сретства !</p>`;
+        document.getElementById("btnInsertNew").style.opacity = 0.5;
+        document.getElementById("btnInsertNew").disabled = true;  
     }else if(globalThis.products.filter(p=>p.barcode==value)!=""){
         if(globalThis.newProductArray.filter(p=>p.barcode==value)!="")
         {
@@ -133,15 +138,28 @@ function readFileFromInternalStorage() {
     window.resolveLocalFileSystemURL(cordova.file.applicationDirectory
      + "www/Popis_Shifrarnik_2021.txt",function(fileEntry){
         fileEntry.file(function (file) {
+            globalThis.products=[];
             if(file.type === "text/plain"){
                 var reader = new FileReader();
-                reader.onloadend = function () {
+                reader.onloadend = function (evt) {
     
                     var content = this.result;
+
+                    var fileContent = new Uint8Array(evt.target.result);
+
+                    var isUTF8 = isUTF8Encoded(fileContent);   
+                    globalThis.products=[];
+                    if(isUTF8){
+
+                    content  = new TextDecoder("utf-8").decode(content);
+
+
                     var lines = content.split('\n');
                     
                     lines.forEach(function (line) {
-                        line = line.split(";");
+                        line = line.trim();
+                        if(/^[^;]+;[^;]+;[^;]+;$/.test(line)){
+                            line = line.split(";");
                         if(line[2]!=undefined){
                         globalThis.products.push({
                             code: line[0],
@@ -149,20 +167,60 @@ function readFileFromInternalStorage() {
                             name: line[2]
                         });
                     }
-                    });
-                };
-                reader.readAsText(file);
+                  }
+                })
+                document.getElementById('result').innerHTML = 
+                "<p style='color:green'>Успечно вчитан фајл од средства</p>";
+            }else{
+                document.getElementById("btnInsertNew").style.opacity = 0.5;
+                document.getElementById("btnInsertNew").disabled = true; 
+
+                globalThis.products=[];
+                document.getElementById('result').innerHTML = 
+                    `<p style='color:red'>Неуспешен вчитан формат на фајл</p>`;
+                return;
+                }
             }
-        })
+        }else{
+            document.getElementById("btnInsertNew").style.opacity = 0.5;
+            document.getElementById("btnInsertNew").disabled = true; 
+
+            globalThis.products=[];
+            document.getElementById('result').innerHTML = 
+            "<p style='color:red'>Неуспешно вчитан фајл од средства</p>"; 
+        }
+        reader.readAsArrayBuffer(file);
+        }
+        )
      }, function(error){
         console.error(error);
      });
 }
+
+function isUTF8Encoded(bytes) {
+       // Check for UTF-8 BOM
+       if (bytes.length >= 3 && bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) {
+        return true;
+    }
+
+    // Check for UTF-8 multi-byte characters
+    for (var i = 0; i < bytes.length; i++) {
+        if ((bytes[i] & 0x80) && !(bytes[i] & 0x40)) {
+            return true; // Found multi-byte character, indicating UTF-8 encoding
+        }
+    }
+    
+    return false;
+}
+
+
 function displayProducts(){
     if(globalThis.products.length>0){
 
     document.querySelector("#productsTable tbody").innerHTML = globalThis.products.map(product =>
     `<tr><td>${product.code}</td><td>${product.name}</td></tr>`).join('');
+    }else{
+        document.querySelector("#productsTable tbody").innerHTML = "";
     }
 }
 
@@ -199,15 +257,17 @@ function Confirm(){
 
 document.getElementById('closeNaziv').addEventListener('click',function(){
     document.getElementById("alertNaziv").style.display = "none"; 
+    document.getElementById('myBody').style.backgroundColor = "white";
     document.getElementById("menuToShow").style.display = "none"; 
-    document.getElementById("homePage").style.display = "block";
+    document.getElementById("homePage").style.display = "none";
     document.getElementById("custom-dialogIsert").style.display = "block"
 },false)
 
 document.getElementById('closeShifra').addEventListener('click',function(){
     document.getElementById("alertShifra").style.display = "none"; 
+    document.getElementById('myBody').style.backgroundColor = "white";
     document.getElementById("menuToShow").style.display = "none"; 
-    document.getElementById("homePage").style.display = "block";
+    document.getElementById("homePage").style.display = "none";
     document.getElementById("custom-dialogIsert").style.display = "block"
 },false)
 
@@ -217,11 +277,13 @@ document.getElementById('insertNew').addEventListener('click',function(){
         if(naziv=="")
         {
             document.getElementById("alertNaziv").style.display = "block";
+            document.getElementById('myBody').style.backgroundColor = "#a6a6a6";
             document.getElementById("menuToShow").style.display = "none";
             document.getElementById("homePage").style.display = "none";
             document.getElementById("custom-dialogIsert").style.display = "none";
         } else if(barcodeNew==""){
             document.getElementById("alertShifra").style.display = "block";
+            document.getElementById('myBody').style.backgroundColor = "#a6a6a6";
             document.getElementById("menuToShow").style.display = "none"; 
             document.getElementById("homePage").style.display = "none";
             document.getElementById("custom-dialogIsert").style.display = "none"
@@ -241,6 +303,7 @@ document.getElementById('insertNew').addEventListener('click',function(){
                 document.getElementById('shifra').value="";
     
                 document.getElementById("custom-dialogIsert").style.display = "none";
+                document.getElementById("homePage").style.display = "block";
                 document.getElementById("menuToShow").style.display = "block"; 
             }else {
                 document.getElementById('btnConfirm').disabled = true;
@@ -250,7 +313,7 @@ document.getElementById('insertNew').addEventListener('click',function(){
                 document.getElementById("btnInsertNew").style.opacity = 0.5;
                 document.getElementById('result').innerText = "";
                 document.getElementById('result').innerHTML = `<p style='color:orange'>Додадено, ${barcodeNew} Disk<br>
-                -> Основното средство е додадено во новиот диск</p>`;
+                -> Основното средство е додадено во новиот попис.</p>`;
                 
                 globalThis.newProductArray.push({
                     code: barcodeNew,
@@ -262,6 +325,7 @@ document.getElementById('insertNew').addEventListener('click',function(){
                 document.getElementById('shifra').value="";
     
                 document.getElementById("custom-dialogIsert").style.display = "none";
+                document.getElementById("homePage").style.display = "block";
                 document.getElementById("menuToShow").style.display = "block";
             }
         }
@@ -271,6 +335,7 @@ document.getElementById('insertNew').addEventListener('click',function(){
     document.getElementById('insertClose').addEventListener('click',function(){
         document.getElementById("custom-dialogIsert").style.display = "none";  
         document.getElementById("menuToShow").style.display = "block";
+        document.getElementById("homePage").style.display = "block";
     },false);
 
 document.getElementById('btnReset').addEventListener('click', function() {
@@ -278,6 +343,7 @@ document.getElementById('btnReset').addEventListener('click', function() {
     document.getElementById("menuToShow").style.display = "none";
     document.getElementById("homePage").style.display = "none";
     document.getElementById("confirmAlert").style.display = 'block';
+    document.getElementById('myBody').style.backgroundColor = "#a6a6a6";
 });
 
 document.getElementById('btnYes').addEventListener('click',function(){
@@ -286,50 +352,78 @@ document.getElementById('btnYes').addEventListener('click',function(){
     document.getElementById("confirmAlert").style.display = 'none';
     document.getElementById("menuToShow").style.display = "block";
     document.getElementById("homePage").style.display = "block";
+    document.getElementById('myBody').style.backgroundColor = "white";
     },false);
  document.getElementById('btnNo').addEventListener('click',function(){
         document.getElementById('result').innerText = "";
         document.getElementById("confirmAlert").style.display = 'none';
         document.getElementById("menuToShow").style.display = "block";
         document.getElementById("homePage").style.display = "block";
+        document.getElementById('myBody').style.backgroundColor = "white";
     },false);
 
-function fileWithOpener(){
-    globalThis.products=[];
-    window.fileChooser.open(function(uri) {
-        window.resolveLocalFileSystemURI(uri, function(fileEntry){
-            fileEntry.file(function(file){
-                    if(file.type === "text/plain")
-                {
-                    var reader = new FileReader();
-                    reader.onloadend = function () {
-                        var content = this.result;
-                        var lines = content.split('\n');
-                        lines.forEach(function (line) {
-                            line = line.split(";");
-                            if(line[2]!=undefined){
-                            globalThis.products.push({
-                                code: line[0],
-                                barcode: line[1],
-                                name: line[2]
-                             });
-                        }
+    function fileWithOpener(){
+        globalThis.products=[];
+        window.fileChooser.open(function(uri) {
+            window.resolveLocalFileSystemURI(uri, function(fileEntry){
+                fileEntry.file(function(file){
+                        if(file.type === "text/plain"){
+                        var reader = new FileReader();
+                        reader.onloadend = function (evt) {
+                            var content = this.result;
+                            
+                            var fileContent = new Uint8Array(evt.target.result);
+                            var isUTF8 = isUTF8Encoded(fileContent);   
+    
+                            if(isUTF8){
+                          
+    
+                            content  = new TextDecoder("utf-8").decode(content);
+    
+                            var lines = content.split('\n');
+                            lines.forEach(function (line) {
+                                line = line.trim();
+                                if(/^[^;]+;[^;]+;[^;]+;$/.test(line)){
+                                        line = line.split(";");
+                                    if(line[2]!=undefined){
+                                    globalThis.products.push({
+                                        code: line[0],
+                                        barcode: line[1],
+                                        name: line[2]
+                                    });
+                                }
+                           }
+                        });
                         document.getElementById('result').innerHTML = 
                         "<p style='color:green'>Успечно вчитан фајл од средства</p>";
-                        });
-                    };
+    
+                    }else{
+                        document.getElementById("btnInsertNew").style.opacity = 0.5;
+                        document.getElementById("btnInsertNew").disabled = true; 
+                        globalThis.products=[];
+                        document.getElementById('result').innerHTML = 
+                            `<p style='color:red'>Неуспешен вчитан формат на фајл</p>`;
+                        return;
+                        }
+                    }
+                    reader.readAsArrayBuffer(file);
+                }else{
+                    document.getElementById("btnInsertNew").style.opacity = 0.5;
+                    document.getElementById("btnInsertNew").disabled = true; 
+                    globalThis.products=[];
+                    document.getElementById('result').innerHTML = 
+                    "<p style='color:red'>Неуспешно вчитан фајл од средства</p>"; 
                 }
-                reader.readAsText(file);
+                }, function(error){
+                    alert(error);
+                })
             }, function(error){
-                alert(error);
-            })
-        }, function(error){
-            alert(error)
-        }, function(){
-            alert(error)
-        });
-     })
-    }
+                alert(error)
+            }, function(){
+                alert(error)
+            });
+         })
+        }
 
     document.getElementById('btnSaveOnDisk').addEventListener('click', function() {
         if(globalThis.newProductArray.length>0){
@@ -341,6 +435,7 @@ function fileWithOpener(){
             document.getElementById('custom-dialog').style.display = 'none';
         }else{
             document.getElementById("alertError").style.display = "block";
+            document.getElementById('myBody').style.backgroundColor = "#a6a6a6";
             document.getElementById("menuToShow").style.display = "none";
             document.getElementById("homePage").style.display = "none";
             document.getElementById("Reviews").style.display = "none";
@@ -350,6 +445,7 @@ function fileWithOpener(){
         
         document.getElementById('closeError').addEventListener('click',function(){
             document.getElementById("alertError").style.display = "none";
+            document.getElementById('myBody').style.backgroundColor = "white";
             document.getElementById("menuToShow").style.display = "block";
             document.getElementById("homePage").style.display = "block";
             },false);
@@ -391,3 +487,17 @@ function writeFile(){
         alert("Error resolving file system URL.");
     });
 }
+
+
+document.getElementById('menuToShow').addEventListener('click', function() {
+    document.getElementById('custom-dialog').style.display = 'block';
+    document.getElementById("homePage").style.display = "none";
+    document.getElementById("Reviews").style.display = "none";
+    if(globalThis.newProductArray.length>0){
+        document.getElementById('btnReset').disabled = false;
+        document.getElementById('btnReset').style.opacity = 1;
+    }else{
+        document.getElementById('btnReset').disabled = true;
+        document.getElementById('btnReset').style.opacity = 0.5;
+    }
+});

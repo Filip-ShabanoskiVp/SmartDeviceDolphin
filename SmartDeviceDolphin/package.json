@@ -46,5 +46,9 @@
       "cordova-plugin-filepicker": {},
       "cordova-plugin-filepath": {}
     }
+  },
+  "dependencies": {
+    "encoding-japanese": "^2.0.0",
+    "jschardet": "^3.0.0"
   }
 }

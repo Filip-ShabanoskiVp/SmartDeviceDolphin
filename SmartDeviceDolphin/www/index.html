@@ -29,12 +29,13 @@
         <meta name="color-scheme" content="light dark">
         <link rel="icon" href="favicon.ico" type="image/x-icon">
         <link rel="stylesheet" href="css/index.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" 
-        integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous"> 
-        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" 
+        integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">  -->
+        <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" /> -->
+        <link rel="stylesheet" type="text/css" href="css/4.0.0-alpha.2-bootstrap.min.css" />
         <title>Попис</title>
     </head>
-    <body>
+    <body style="background-color:white" id="myBody">
         <div class="navbar navbar-fixed-top">
             <div class="dropdown">
               <button id="menuToShow" class="dropbtn">Мени 
@@ -93,7 +94,7 @@
                 <div class="col card">
                     <div class="card-content">
                           <p>Мора да внесете назив на основното средство</p>
-                          <button class="btn btn-primary" id="closeNaziv">Close</button>
+                          <button class="btn btn-primary" id="closeNaziv">Затвори</button>
                     </div>
                 </div>
              </div>
@@ -104,7 +105,7 @@
                     <div class="col card">
                         <div class="card-content">
                             <p>Мора да внесете шифра на основното средство</p>
-                            <button class="btn btn-primary" id="closeShifra">Close</button>
+                            <button class="btn btn-primary" id="closeShifra">Затвори</button>
                         </div>
                     </div>
                 </div>
@@ -128,7 +129,7 @@
                 <div class="col card">
                     <div class="card-content">
                         <p>Немате внесено во попис нов или немате вчитано фајл со средства од диск</p>
-                        <button class="btn btn-primary" id="closeError">Close</button>
+                        <button class="btn btn-primary" id="closeError">Затвори</button>
                     </div>
                 </div>
             </div>
@@ -139,7 +140,7 @@
                 <div class="col card">
                     <div class="card-content">
                         <p>Неуспешно скенирање: Не легален пристап</p>
-                        <button class="btn btn-primary" id="closeScanError">Close</button>
+                        <button class="btn btn-primary" id="closeScanError">Затвори</button>
                     </div>
                 </div>
             </div>
@@ -166,11 +167,12 @@
     </div>
 </div> 
 </div>
-        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-        <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+        <!-- <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script> -->
         <script src="cordova.js"></script>
         <script src="js/index.js"></script>
         <script>
+           
             var customDialog = document.getElementById('custom-dialog');
             var btnLoad = document.getElementById('btnLoad');
             var btnReview = document.getElementById('btnReview');
@@ -197,6 +199,7 @@
 
             btnClose.addEventListener('click', function() {
                 customDialog.style.display = 'none';
+                document.getElementById("homePage").style.display = "block";
             });
 
 
@@ -212,11 +215,8 @@
             }
             document.getElementById("btnInsertNew").addEventListener('click', function() {
                 document.getElementById("menuToShow").style.display = "none";
+                document.getElementById("homePage").style.display = "none";
                 customdDialogIsertNew.style.display = "block";
-            });
-
-            document.getElementById('menuToShow').addEventListener('click', function() {
-                document.getElementById('custom-dialog').style.display = 'block';
             });
 
             
