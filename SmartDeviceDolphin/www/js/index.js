@@ -28,8 +28,8 @@ var locations = [];
 
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
-    readFileFromInternalStorage("products");
-    readFileFromInternalStorage("locations");
+    // readFileFromInternalStorage("products");
+    // readFileFromInternalStorage("locations");
 
     btnScanner();  
     searchBtn();
@@ -60,6 +60,7 @@ function scan(){
                 }
             }, function () {
                 document.getElementById("alertScanner").style.display = "block";
+                document.getElementById('ReviewsNew').style.display = "none";
                 document.getElementById("menuToShow").style.display = "none";
                 document.getElementById("homePage").style.display = "none";
                 document.getElementById('myBody').style.backgroundColor = "#a6a6a6";
@@ -90,7 +91,15 @@ document.getElementById('closeScanError').addEventListener('click',function(){
         document.getElementById("btnInsertNew").style.opacity = 0.5;
         document.getElementById("btnInsertNew").disabled = true;  
         document.getElementById('barkod').value = ""
-    }else if(globalThis.products.filter(p=>p.barcode==value)!=""){
+    } else if(globalThis.locations.length<=0) {
+        document.getElementById('result').innerHTML = `<p style='color:red'>Немате 
+        вчитано листа на локации, пред да започнете со попис морате да вчитате
+        шифри на локациите !</p>`;
+        document.getElementById("btnInsertNew").style.opacity = 0.5;
+        document.getElementById("btnInsertNew").disabled = true;  
+        document.getElementById('barkod').value = ""
+    }
+    else if(globalThis.products.filter(p=>p.barcode==value)!=""){
         if(globalThis.newProductArray.filter(p=>p.barcode==value)!="")
         {
             document.getElementById('barkod').value = ""
@@ -104,10 +113,14 @@ document.getElementById('closeScanError').addEventListener('click',function(){
         document.getElementById("btnInsertNew").disabled = true;   
         document.getElementById("btnInsertNew").style.opacity = 0.5;  
         document.getElementById('barkod').value = ""  
-        document.getElementById('result').innerHTML = "Пронајдено, " + value +"<br/>" 
-        + globalThis.products.filter(p=>p.barcode==value).map(function(p){
+        document.getElementById('result').innerHTML = "Пронајдено, Баркод: " + value +"<br/>" 
+        + ", Назив: "+ globalThis.products.filter(p=>p.barcode==value).map(function(p){
             return p.name;
-        });
+        }) + ", Шифра на локација: " + globalThis.products.filter(p=>p.barcode==value).map(function(p){
+            return p.codeLocation;
+        }) + ", Назив на локација: " +  globalThis.products.filter(p=>p.barcode==value).map(function(p){
+            return globalThis.locations.find(location=>location.code==p.codeLocation).name;
+        })
     }else {
         globalThis.ValueToConfirm = value;
         document.getElementById('barkod').value = value;
@@ -282,6 +295,21 @@ function displayProducts(){
     }
 }
 
+function displayLocations(){
+    if(globalThis.locations.length > 0) {
+        var selectLocationList = "";
+        selectLocationList = document.getElementById("lokacija");
+        globalThis.locations.forEach(function(location) {
+            var option = document.createElement('option');
+            option.text = location.name;
+            option.value = location.code;
+            selectLocationList.appendChild(option);
+        })
+    }else {
+        document.getElementById("lokacija").innerHTML = "";
+    }
+}
+
 function btnConfirm(){
     let btn = document.getElementById('btnConfirm');
     btn.addEventListener('click',Confirm,false)
@@ -312,16 +340,46 @@ function Confirm(){
             return p.name;
         })}<br>-> Основното средство е внесено во новиот попис</p>`;
 
-        globalThis.newProductArray.push({
-            code: globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
-                return p.code;
-            }),
+        let codeToAdd;
+        if (globalThis.newProductArray.length === 0) {
+            codeToAdd = "000000";
+        } else {
+            let lastItem = parseInt(globalThis.newProductArray[globalThis.newProductArray.length - 1].code, 10);;
+            if(isNaN(lastItem)) {
+                lastItem = 0;
+            }
+            lastItem++; // Increment
+            codeToAdd = lastItem.toString().padStart(6, "0"); // Pad with leading zeros
+        }
+        if(globalThis.locations.length > 0) {
+            globalThis.newProductArray.push({
+                code:codeToAdd,
+                barcode: globalThis.ValueToConfirm,
+                name: globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
+                    return p.name;
+                }),
+                codeLocation: globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
+                    return p.codeLocation;
+                }),
+                nameLocation: globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
+                     globalThis.locations.filter(location=>location.code==p.codeLocation).map(function(l){
+                        return l.name;
+                     });
+                }),
+                dateTimesString: dateTimeString
+            });
+        } else {
+             globalThis.newProductArray.push({
+            code: codeToAdd,
             barcode: globalThis.ValueToConfirm,
             name: globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
                 return p.name;
             }),
+            codeLocation: '',
+            nameLocation:'',
             dateTimesString: dateTimeString
         });
+        }
         // alert(globalThis.newProductArray.length);
         globalThis.ValueToConfirm = "";
     }
@@ -346,6 +404,11 @@ document.getElementById('closeShifra').addEventListener('click',function(){
 document.getElementById('insertNew').addEventListener('click',function(){
         var naziv = document.getElementById('naziv').value;
         var barcodeNew = document.getElementById('shifra').value;
+        var location = "";
+        if( globalThis.locations.length > 0){
+        location = document.getElementById('lokacija').value;
+        }
+        document.getElementById('ReviewsNew').style.display = "none";
         if(naziv=="")
         {
             document.getElementById("alertNaziv").style.display = "block";
@@ -373,11 +436,13 @@ document.getElementById('insertNew').addEventListener('click',function(){
     
                 document.getElementById('naziv').value="";
                 document.getElementById('shifra').value="";
-                document.getElementById('barkod').value = "" 
+                document.getElementById('barkod').value = ""
+                document.getElementById("lokacija").value = ""; 
     
                 document.getElementById("custom-dialogIsert").style.display = "none";
                 document.getElementById("homePage").style.display = "block";
                 document.getElementById("menuToShow").style.display = "block"; 
+                document.getElementById('ReviewsNew').style.display = "none";
             }else {
                 var datum = new Date();
                 var day = datum.getDay().toString().padStart(2,'0');
@@ -399,21 +464,54 @@ document.getElementById('insertNew').addEventListener('click',function(){
                 document.getElementById('result').innerText = "";
                 document.getElementById('result').innerHTML = `<p style='color:orange'>Додадено, ${barcodeNew} Disk<br>
                 -> Основното средство е додадено во новиот попис.</p>`;
-                
-                globalThis.newProductArray.push({
-                    code: barcodeNew,
-                    barcode: barcodeNew,
-                    name: naziv,
-                    dateTimesString: dateTimeString
-                    });
+
+                let codeToAdd;
+                if (globalThis.newProductArray.length === 0) {
+                    codeToAdd = "000000";
+                } else {
+                    let lastItem = parseInt(globalThis.newProductArray[globalThis.newProductArray.length - 1].code, 10);;
+                    if(isNaN(lastItem)) {
+                        lastItem = 0;
+                    }
+                    lastItem++; // Increment
+                    codeToAdd = lastItem.toString().padStart(6, "0");
+                }
+
+                if( globalThis.locations.length > 0) {
+
+                    globalThis.newProductArray.push({
+                        code: codeToAdd,
+                        barcode: barcodeNew,
+                        name: naziv,
+                        codeLocation:location,
+                        nameLocation: globalThis.locations.forEach(function(loc){
+                            if(loc.code == location){
+                                return loc.name;
+                            }
+                        }),
+                        dateTimesString: dateTimeString
+                        });
+
+                } else {
+                    globalThis.newProductArray.push({
+                        code: codeToAdd,
+                        barcode: barcodeNew,
+                        name: naziv,
+                        codeLocation:'',
+                        nameLocation:'',
+                        dateTimesString: dateTimeString
+                        });
+                }
                 // alert(globalThis.newProductArray.length);
                 document.getElementById('naziv').value="";
                 document.getElementById('shifra').value="";
                 document.getElementById('barkod').value = "" 
+                document.getElementById("lokacija").value = ""; 
     
                 document.getElementById("custom-dialogIsert").style.display = "none";
                 document.getElementById("homePage").style.display = "block";
                 document.getElementById("menuToShow").style.display = "block";
+                document.getElementById('ReviewsNew').style.display = "none";
             }
         }
     }
@@ -423,6 +521,7 @@ document.getElementById('insertNew').addEventListener('click',function(){
         document.getElementById("custom-dialogIsert").style.display = "none";  
         document.getElementById("menuToShow").style.display = "block";
         document.getElementById("homePage").style.display = "block";
+        document.getElementById('ReviewsNew').style.display = "none";
     },false);
 
 document.getElementById('btnReset').addEventListener('click', function() {
@@ -431,6 +530,7 @@ document.getElementById('btnReset').addEventListener('click', function() {
     document.getElementById("homePage").style.display = "none";
     document.getElementById("confirmAlert").style.display = 'block';
     document.getElementById('myBody').style.backgroundColor = "#a6a6a6";
+    document.getElementById('ReviewsNew').style.display = "none";
 });
 
 document.getElementById('btnYes').addEventListener('click',function(){
@@ -439,6 +539,7 @@ document.getElementById('btnYes').addEventListener('click',function(){
     document.getElementById("confirmAlert").style.display = 'none';
     document.getElementById("menuToShow").style.display = "block";
     document.getElementById("homePage").style.display = "block";
+    document.getElementById('ReviewsNew').style.display = "none";
     document.getElementById('myBody').style.backgroundColor = "white";
     },false);
  document.getElementById('btnNo').addEventListener('click',function(){
@@ -447,6 +548,7 @@ document.getElementById('btnYes').addEventListener('click',function(){
         document.getElementById("menuToShow").style.display = "block";
         document.getElementById("homePage").style.display = "block";
         document.getElementById('myBody').style.backgroundColor = "white";
+        document.getElementById('ReviewsNew').style.display = "none";
     },false);
 
      function fileWithOpener(type){
@@ -568,6 +670,7 @@ document.getElementById('btnYes').addEventListener('click',function(){
             document.getElementById("Reviews").style.display = "none";
         }
         document.getElementById('custom-dialog').style.display = 'none';
+        document.getElementById('ReviewsNew').style.display = "none";
         });
         
         document.getElementById('closeError').addEventListener('click',function(){
@@ -594,11 +697,16 @@ function writeFile(){
               var lines = [];
               globalThis.newProductArray.forEach(function(line){
                 
-            //    alert((line.code+";"+line.barcode+";"+line.name).toString());
-                lines.push((line.code+";"+line.barcode+";"+line.name + ";" + line.dateTimesString).toString())
+            var locationName
+            var location = globalThis.locations.find(location=>location.code == line.codeLocation);
+            if(location){
+                locationName = location.name;
+            }
+
+            lines.push((line.code+";"+line.barcode+";"+line.name + ";" + line.codeLocation  + ";" + locationName + ";"
+                 + line.dateTimesString).toString()) + ";";
               });
               var data = lines.join('\n');
-            //   alert(data);
 
                 var blob = new Blob([data], { type: 'text/plain' });
                 fileWriter.write(blob);
@@ -620,6 +728,7 @@ document.getElementById('menuToShow').addEventListener('click', function() {
     document.getElementById('custom-dialog').style.display = 'block';
     document.getElementById("homePage").style.display = "none";
     document.getElementById("Reviews").style.display = "none";
+    document.getElementById('ReviewsNew').style.display = "none";
     if(globalThis.products.length>0 && globalThis.locations.length>0){
     document.getElementById('btnReview').disabled= false;
     document.getElementById('btnReview').style.opacity = 1;
@@ -630,8 +739,89 @@ document.getElementById('menuToShow').addEventListener('click', function() {
     if(globalThis.newProductArray.length>0){
         document.getElementById('btnReset').disabled = false;
         document.getElementById('btnReset').style.opacity = 1;
+        document.getElementById('btnPopisNov').disabled = false;
+        document.getElementById('btnPopisNov').style.opacity = 1;
+        document.getElementById("btnSaveOnDisk").disabled = false;
+        document.getElementById('btnSaveOnDisk').style.opacity = 1;
     }else{
         document.getElementById('btnReset').disabled = true;
         document.getElementById('btnReset').style.opacity = 0.5;
+        document.getElementById('btnPopisNov').disabled = true;
+        document.getElementById('btnPopisNov').style.opacity = 0.5;
+        document.getElementById('btnSaveOnDisk').disabled = true;
+        document.getElementById('btnSaveOnDisk').style.opacity = 0.5;
     }
 });
+ReviewsNew
+
+document.getElementById('btnPopisNov').addEventListener('click', function(){
+    displayNewProducts()
+    document.getElementById('ReviewsNew').style.display = "block";
+    document.getElementById("homePage").style.display = "none";
+    document.getElementById("Reviews").style.display = "none";
+    document.getElementById("Reviews").style.display = "none";
+    document.getElementById('custom-dialog').style.display = 'none';
+})
+
+
+function displayNewProducts(){
+    if(globalThis.newProductArray.length>0){
+
+        document.querySelector("#productsNewTable tbody").innerHTML = globalThis.newProductArray.map(product => {
+            var locationName = '';
+            var location = globalThis.locations.find(location=>location.code == product.codeLocation);
+            if(location) {
+                locationName = location.name;
+            }
+
+            // displayLocationsChange();
+            return `<tr><td>${product.code}</td><td>${product.name}</td><td>${product.codeLocation}</td>
+            <td>${locationName}</td> <td>${product.dateTimesString}</td><td>
+            <select id='lokacijaPromeni' class="form-control"></select></td>
+            <td><button class='btn btn-danger' onclick="deleteReview(${product.barcode})">Избриши</button</td></tr>`;
+        }).join('');
+    }else{
+        document.querySelector("#productsTable tbody").innerHTML = "";
+    }
+}
+
+function deleteReview(barcode){
+    var nova = globalThis.newProductArray.filter(p=>p.barcode!=barcode);
+    globalThis.newProductArray = [...nova];
+    if(globalThis.newProductArray.length==0){
+        document.getElementById('result').innerHTML = "<p style='color:green'>Нов попис е ресетиран!</p>";
+    }else{
+    document.getElementById('result').innerHTML = "<p style='color:green'>Пописот е избришан од листата на нов попис!</p>";
+    }
+    document.getElementById("ReviewsNew").style.display = 'none';
+    document.getElementById("menuToShow").style.display = "block";
+    document.getElementById("homePage").style.display = "block";
+
+}
+
+
+function displayLocationsChange() {
+    alert("Displaying locations change");
+    alert("Number of locations:", globalThis.locations.length);
+    var selectLocationList = document.getElementById("lokacijaPromeni");
+    alert("Select element:", selectLocationList);
+    if (globalThis.locations.length > 0 && selectLocationList) {
+        alert.log("Inside if condition");
+        selectLocationList.innerHTML = ""; // Clear the select options
+        globalThis.locations.forEach(function(location) {
+            console.log("Appending option for location:", location);
+            var option = document.createElement('option');
+            option.text = location.name;
+            option.value = location.code;
+            selectLocationList.appendChild(option);
+        });
+    } else {
+        alert("No locations or select element not found");
+        // Handle the case when there are no locations or select element is not found
+        if (selectLocationList) {
+            selectLocationList.innerHTML = ""; // Clear the select options
+        }
+    }
+}
+
+

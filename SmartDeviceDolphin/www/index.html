@@ -69,13 +69,14 @@
                 </div>
             </div> 
             <div>
-                <div id="custom-dialog" style="display: none;">
+                <div id="custom-dialog" style="display: none;margin-top:25px">
                     <button id="btnLoad" class="btn btn-primary btn-lg btn-block">Вчитај фајл со средства од диск</button><br>
                     <button id="btnLoadLocations"  class="btn btn-primary  btn-lg btn-block">Вчитај фајл со локации од диск</button><br>
                     <button id="btnReview"  class="btn btn-primary  btn-lg btn-block">Прегледи</button><br>
                     <button id="btnReset"  class="btn btn-primary  btn-lg btn-block">Ресетирај попис на ново</button><br>
                     <button id="btnSaveOnDisk"  class="btn btn-primary  btn-lg btn-block">Запиши попис на диск</button><br>
                     <button id="btnSretstva"  class="btn btn-primary  btn-lg btn-block">Основни Сретства</button><br>
+                    <button id="btnPopisNov"  class="btn btn-primary  btn-lg btn-block">Попис нов</button><br>
                     <button id="btnClose"  class="btn btn-primary  btn-lg btn-block">Излез</button><br>
                 </div>
             </div>
@@ -87,8 +88,6 @@
                     <label>Назив</label>
                     <textarea id="naziv" class="form-control"></textarea><br>
                     <select id="lokacija" class="form-control">
-                        <option>ОПШТ СЕКТОР</option>
-                        <option>САЛА</option>
                     </select><br>
                     <button class="btn btn-primary" id="insertNew">Внеси во попис како ново</button>
                     <button style="margin-top: 5px;" id="insertClose" class="btn btn-danger">Излез</button>
@@ -153,25 +152,52 @@
             <div class="row card-container" id="Reviews" style="display: none;position:relative;right:5px">
                 <div class="col card">
                     <div class="card-content">
-                    <h3>Преглед - Пописна Листа</h1>
-                    <hr/>
-                    <div class="table-responsive" style=" height:400px;overflow:auto;">
-                    <table class="table table-striped" id="productsTable">
-                    <thead>
-                    <tr>
-                        <th>Шифра</th>
-                        <th>Назив</th>
-                        <th>Локација</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>  
-            <div id="files"></div>
+                        <h3>Преглед - Пописна Листа</h3>
+                        <hr/>
+                         <div class="table-responsive" style=" height:400px;overflow:auto;">
+                            <table class="table table-striped" id="productsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Шифра</th>
+                                        <th>Назив</th>
+                                        <th>Локација</th>
+                                    </tr>
+                                 </thead>
+                                  <tbody>
+                                 </tbody>
+                             </table>
+                          </div>  
+                        </div>
+                    </div>
+                </div>
          </div>
+         <div class="row card-container" id="ReviewsNew" style="display: none;position:relative;right:5px">
+            <div class="col card">
+                <div class="card-content">
+                    <h3>Преглед - Попис нов Листа</h3>
+                    <hr/>
+                     <div class="table-responsive" style=" height:400px;overflow:auto;">
+                        <table class="table table-striped" id="productsNewTable">
+                            <thead>
+                                <tr>
+                                    <th>Шифра</th>
+                                    <th>Назив</th>
+                                    <th>Локација код</th>
+                                    <th>Локација Назив</th>
+                                    <th>Датум</th>
+                                    <th>Промени Локација</th>
+                                    <th>Избриши</th>
+                                </tr>
+                             </thead>
+                              <tbody>
+                             </tbody>
+                         </table>
+                      </div>  
+                    </div>
+                </div>
+            </div>
+     </div>
     </div>
-</div> 
 </div>
         <!-- <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
         <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script> -->
@@ -232,8 +258,10 @@
                 document.getElementById("homePage").style.display = "none";
                 customdDialogIsertNew.style.display = "block";
                 if(globalThis.locations.length > 0){
+                    displayLocations()
                     document.getElementById("lokacija").style.display = "block";  
                 }else {
+                    displayLocations()
                     document.getElementById("lokacija").style.display = "none";
                 }
             });
