@@ -24,10 +24,12 @@ document.addEventListener('deviceready', onDeviceReady, false);
 var products = [];
 var ValueToConfirm = "";
 var newProductArray = [];
+var locations = [];
 
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
-    // readFileFromInternalStorage()
+    readFileFromInternalStorage("products");
+    readFileFromInternalStorage("locations");
 
     btnScanner();  
     searchBtn();
@@ -57,10 +59,11 @@ function scan(){
                     // }
                 }
             }, function () {
-        document.getElementById("alertScanner").style.display = "block";
-        document.getElementById("menuToShow").style.display = "none";
-        document.getElementById("homePage").style.display = "none";
-        document.getElementById('myBody').style.backgroundColor = "#a6a6a6";
+                document.getElementById("alertScanner").style.display = "block";
+                document.getElementById("menuToShow").style.display = "none";
+                document.getElementById("homePage").style.display = "none";
+                document.getElementById('myBody').style.backgroundColor = "#a6a6a6";
+                
             }
     );  
  }
@@ -78,7 +81,7 @@ document.getElementById('closeScanError').addEventListener('click',function(){
 
 
  function productExists(value){
-    globalThis.ValueToConfirm = "";
+    // globalThis.ValueToConfirm = "";
     if(globalThis.products.length<=0){
 
         document.getElementById('result').innerHTML = `<p style='color:red'>Немате 
@@ -86,9 +89,11 @@ document.getElementById('closeScanError').addEventListener('click',function(){
         шифри на основни сретства !</p>`;
         document.getElementById("btnInsertNew").style.opacity = 0.5;
         document.getElementById("btnInsertNew").disabled = true;  
+        document.getElementById('barkod').value = ""
     }else if(globalThis.products.filter(p=>p.barcode==value)!=""){
         if(globalThis.newProductArray.filter(p=>p.barcode==value)!="")
         {
+            document.getElementById('barkod').value = ""
             document.getElementById('result').innerHTML = `<p style='color:blue'>Ова основно средство е веќе 
             внесено во попис, не може да се повторуваат средствата!</p>`;   
             return;  
@@ -97,13 +102,15 @@ document.getElementById('closeScanError').addEventListener('click',function(){
         document.getElementById('btnConfirm').disabled = false;  
         document.getElementById('btnConfirm').style.opacity = 1;
         document.getElementById("btnInsertNew").disabled = true;   
-        document.getElementById("btnInsertNew").style.opacity = 0.5;    
+        document.getElementById("btnInsertNew").style.opacity = 0.5;  
+        document.getElementById('barkod').value = ""  
         document.getElementById('result').innerHTML = "Пронајдено, " + value +"<br/>" 
         + globalThis.products.filter(p=>p.barcode==value).map(function(p){
             return p.name;
         });
     }else {
-        globalThis.ValueToConfirm = "";
+        globalThis.ValueToConfirm = value;
+        document.getElementById('barkod').value = value;
         document.getElementById('shifra').value = value;
         document.getElementById('btnConfirm').disabled = true;
         document.getElementById("btnInsertNew").disabled = false;
@@ -128,17 +135,21 @@ function Search(){
         productExists(value);
     }else{
         document.getElementById('result').innerText = "";
+        document.getElementById('barkod').value = ""
     }
-    document.getElementById('barkod').value = ""
 }
 
 
-function readFileFromInternalStorage() {
-    globalThis.products=[];
+function readFileFromInternalStorage(type) {
+    var path = "";
+    if(type=='products') {
+        path = "www/Popis_Shifrarnik_2024.txt";
+    } else {
+        path = "www/Lokacii_2024.txt";
+    }
     window.resolveLocalFileSystemURL(cordova.file.applicationDirectory
-     + "www/Popis_Shifrarnik_2021.txt",function(fileEntry){
+     + path,function(fileEntry){
         fileEntry.file(function (file) {
-            globalThis.products=[];
             if(file.type === "text/plain"){
                 var reader = new FileReader();
                 reader.onloadend = function (evt) {
@@ -147,8 +158,13 @@ function readFileFromInternalStorage() {
 
                     var fileContent = new Uint8Array(evt.target.result);
 
-                    var isUTF8 = isUTF8Encoded(fileContent);   
-                    globalThis.products=[];
+                    var isUTF8 = isUTF8Encoded(fileContent);  
+                    
+                    if(type=='products'){ 
+                         globalThis.products=[];
+                    }else {
+                          globalThis.locations=[];
+                    }
                     if(isUTF8){
 
                     content  = new TextDecoder("utf-8").decode(content);
@@ -158,36 +174,70 @@ function readFileFromInternalStorage() {
                     
                     lines.forEach(function (line) {
                         line = line.trim();
-                        if(/^[^;]+;[^;]+;[^;]+;$/.test(line)){
-                            line = line.split(";");
-                        if(line[2]!=undefined){
-                        globalThis.products.push({
-                            code: line[0],
-                            barcode: line[1],
-                            name: line[2]
-                        });
-                    }
-                  }
-                })
-                document.getElementById('result').innerHTML = 
-                "<p style='color:green'>Успечно вчитан фајл од средства</p>";
-            }else{
-                document.getElementById("btnInsertNew").style.opacity = 0.5;
-                document.getElementById("btnInsertNew").disabled = true; 
 
-                globalThis.products=[];
+                        if(type=='products'){ 
+                            if(/^[^;]+;[^;]+;[^;]+;[^;]+;$/.test(line)){
+                                line = line.split(";");
+                            if(line[2]!=undefined){
+                            globalThis.products.push({
+                                code: line[0],
+                                barcode: line[1],
+                                name: line[2],
+                                codeLocation: line[3]
+                            });
+                        }
+                      }
+                    } else {
+                        if(/^[^;]+;[^;]+$/.test(line)){
+                            line = line.split(";");
+                            if(line[1]!="..."){
+                                globalThis.locations.push({
+                                    code: line[0],
+                                    name: line[1],
+                                });
+                            }
+                         }
+                    }
+                })
+
+                if(type=='products'){
+                    document.getElementById('result').innerHTML = ""; 
+                    document.getElementById('result').innerHTML = 
+                    "<p style='color:green'>Успечно вчитан фајл од средства</p>";
+                }else{
+                    document.getElementById('result').innerHTML = ""; 
+                    document.getElementById('result').innerHTML = 
+                    "<p style='color:green'>Успечно вчитан фајл од локации</p>";
+                }
+            }else{
+
+                if(type=='products'){
+                    document.getElementById("btnInsertNew").style.opacity = 0.5;
+                    document.getElementById("btnInsertNew").disabled = true; 
+    
+                    globalThis.products=[];
+                } else {
+                    globalThis.locations=[];
+                }
                 document.getElementById('result').innerHTML = 
-                    `<p style='color:red'>Неуспешен вчитан формат на фајл</p>`;
-                return;
+                `<p style='color:red'>Неуспешен вчитан формат на фајл</p>`;
+                 return;
                 }
             }
         }else{
-            document.getElementById("btnInsertNew").style.opacity = 0.5;
-            document.getElementById("btnInsertNew").disabled = true; 
 
-            globalThis.products=[];
-            document.getElementById('result').innerHTML = 
-            "<p style='color:red'>Неуспешно вчитан фајл од средства</p>"; 
+            if(type=='products'){
+                document.getElementById("btnInsertNew").style.opacity = 0.5;
+                document.getElementById("btnInsertNew").disabled = true; 
+    
+                globalThis.products=[];
+                document.getElementById('result').innerHTML = 
+                "<p style='color:red'>Неуспешно вчитан фајл од средства</p>"; 
+            } else{
+                globalThis.locations=[];
+                document.getElementById('result').innerHTML = 
+                "<p style='color:red'>Неуспешно вчитан фајл од локации</p>";      
+            }
         }
         reader.readAsArrayBuffer(file);
         }
@@ -196,6 +246,7 @@ function readFileFromInternalStorage() {
         console.error(error);
      });
 }
+
 
 function isUTF8Encoded(bytes) {
        // Check for UTF-8 BOM
@@ -215,10 +266,17 @@ function isUTF8Encoded(bytes) {
 
 
 function displayProducts(){
+
     if(globalThis.products.length>0){
 
-    document.querySelector("#productsTable tbody").innerHTML = globalThis.products.map(product =>
-    `<tr><td>${product.code}</td><td>${product.name}</td></tr>`).join('');
+    document.querySelector("#productsTable tbody").innerHTML = globalThis.products.map(product => {
+        var locationName = '';
+        var location = globalThis.locations.find(location=>location.code == product.codeLocation);
+        if(location) {
+            locationName = location.name;
+        }
+        return `<tr><td>${product.code}</td><td>${product.name}</td><td>${locationName}</td></tr>`;
+     }).join('');
     }else{
         document.querySelector("#productsTable tbody").innerHTML = "";
     }
@@ -231,6 +289,19 @@ function btnConfirm(){
 
 function Confirm(){
     if(globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm)!=""){
+
+        var datum = new Date();
+        var day = datum.getDay().toString().padStart(2,'0');
+        var month  = (datum.getMonth() + 1).toString().padStart(2,'0');
+        var year = datum.getFullYear().toString();
+        var hours =  datum.getHours().toString().padStart(2,'0');
+        var minutes = datum.getMinutes().toString().padStart(2,'0');
+        var seconds = datum.getSeconds().toString().padStart(2,'0');
+
+     
+        var dateTimeString = (day + "/" + month + "/" + year + " "+  hours 
+        + ":" + minutes + ":" + seconds);
+
         document.getElementById('btnConfirm').disabled = true;
         document.getElementById("btnInsertNew").disabled = true;
         document.getElementById('btnConfirm').style.opacity = 0.5;
@@ -248,7 +319,8 @@ function Confirm(){
             barcode: globalThis.ValueToConfirm,
             name: globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
                 return p.name;
-            })
+            }),
+            dateTimesString: dateTimeString
         });
         // alert(globalThis.newProductArray.length);
         globalThis.ValueToConfirm = "";
@@ -301,11 +373,24 @@ document.getElementById('insertNew').addEventListener('click',function(){
     
                 document.getElementById('naziv').value="";
                 document.getElementById('shifra').value="";
+                document.getElementById('barkod').value = "" 
     
                 document.getElementById("custom-dialogIsert").style.display = "none";
                 document.getElementById("homePage").style.display = "block";
                 document.getElementById("menuToShow").style.display = "block"; 
             }else {
+                var datum = new Date();
+                var day = datum.getDay().toString().padStart(2,'0');
+                var month  = (datum.getMonth() + 1).toString().padStart(2,'0');
+                var year = datum.getFullYear().toString();
+                var hours =  datum.getHours().toString().padStart(2,'0');
+                var minutes = datum.getMinutes().toString().padStart(2,'0');
+                var seconds = datum.getSeconds().toString().padStart(2,'0');
+        
+             
+                var dateTimeString = (day + "/" + month + "/" + year + " "+  hours 
+                + ":" + minutes + ":" + seconds)
+
                 document.getElementById('btnConfirm').disabled = true;
                 document.getElementById("btnInsertNew").disabled = true;
     
@@ -318,11 +403,13 @@ document.getElementById('insertNew').addEventListener('click',function(){
                 globalThis.newProductArray.push({
                     code: barcodeNew,
                     barcode: barcodeNew,
-                    name: naziv
+                    name: naziv,
+                    dateTimesString: dateTimeString
                     });
                 // alert(globalThis.newProductArray.length);
                 document.getElementById('naziv').value="";
                 document.getElementById('shifra').value="";
+                document.getElementById('barkod').value = "" 
     
                 document.getElementById("custom-dialogIsert").style.display = "none";
                 document.getElementById("homePage").style.display = "block";
@@ -362,68 +449,108 @@ document.getElementById('btnYes').addEventListener('click',function(){
         document.getElementById('myBody').style.backgroundColor = "white";
     },false);
 
-    function fileWithOpener(){
-        globalThis.products=[];
-        window.fileChooser.open(function(uri) {
-            window.resolveLocalFileSystemURI(uri, function(fileEntry){
-                fileEntry.file(function(file){
-                        if(file.type === "text/plain"){
-                        var reader = new FileReader();
-                        reader.onloadend = function (evt) {
-                            var content = this.result;
-                            
-                            var fileContent = new Uint8Array(evt.target.result);
-                            var isUTF8 = isUTF8Encoded(fileContent);   
-    
-                            if(isUTF8){
-                          
-    
-                            content  = new TextDecoder("utf-8").decode(content);
-    
-                            var lines = content.split('\n');
-                            lines.forEach(function (line) {
-                                line = line.trim();
-                                if(/^[^;]+;[^;]+;[^;]+;$/.test(line)){
-                                        line = line.split(";");
-                                    if(line[2]!=undefined){
-                                    globalThis.products.push({
-                                        code: line[0],
-                                        barcode: line[1],
-                                        name: line[2]
-                                    });
+     function fileWithOpener(type){
+            window.fileChooser.open(function(uri) {
+                window.resolveLocalFileSystemURI(uri, function(fileEntry){
+                    fileEntry.file(function(file){
+                            if(file.type === "text/plain"){
+                                var reader = new FileReader();
+                                reader.onloadend = function (evt) {
+                    
+                                    var content = this.result;
+                
+                                    var fileContent = new Uint8Array(evt.target.result);
+                
+                                    var isUTF8 = isUTF8Encoded(fileContent);   
+
+                                    if(type=='products'){ 
+                                        globalThis.products=[];
+                                   }else {
+                                         globalThis.locations=[];
+                                   }
+
+                                    if(isUTF8){
+                
+                                    content  = new TextDecoder("utf-8").decode(content);
+                
+                
+                                    var lines = content.split('\n');
+                                    
+                                    lines.forEach(function (line) {
+                                        line = line.trim()
+
+                                        if(type=='products'){ 
+                                            if(/^[^;]+;[^;]+;[^;]+;[^;]+;$/.test(line)){
+                                                line = line.split(";");
+                                            if(line[2]!=undefined){
+                                            globalThis.products.push({
+                                                code: line[0],
+                                                barcode: line[1],
+                                                name: line[2],
+                                                codeLocation: line[3]
+                                            });
+                                        }
+                                      }
+                                        } else{
+                                            if(/^[^;]+;[^;]+$/.test(line)){
+                                                line = line.split(";");
+                                                if(line[1]!="..."){
+                                                    globalThis.locations.push({
+                                                        code: line[0],
+                                                        name: line[1],
+                                                    });
+                                                }
+                                             }
+                                        }
+                                }   )
+                                if(type=='products'){
+                                    document.getElementById('result').innerHTML = ""; 
+                                    document.getElementById('result').innerHTML = 
+                                    "<p style='color:green'>Успечно вчитан фајл од средства</p>";
+                                }else{
+                                    document.getElementById('result').innerHTML = ""; 
+                                    document.getElementById('result').innerHTML = 
+                                    "<p style='color:green'>Успечно вчитан фајл од локации</p>";
                                 }
-                           }
-                        });
-                        document.getElementById('result').innerHTML = 
-                        "<p style='color:green'>Успечно вчитан фајл од средства</p>";
-    
-                    }else{
-                        document.getElementById("btnInsertNew").style.opacity = 0.5;
-                        document.getElementById("btnInsertNew").disabled = true; 
-                        globalThis.products=[];
-                        document.getElementById('result').innerHTML = 
+                        }else{
+                            if(type=='products'){
+                                document.getElementById("btnInsertNew").style.opacity = 0.5;
+                                document.getElementById("btnInsertNew").disabled = true; 
+                
+                                globalThis.products=[];
+                            } else {
+                                globalThis.locations=[];
+                            }
+                            document.getElementById('result').innerHTML = 
                             `<p style='color:red'>Неуспешен вчитан формат на фајл</p>`;
-                        return;
+                             return;
+                            }
+                        }
+                        reader.readAsArrayBuffer(file);
+                    }else{
+                        if(type=='products'){
+                            document.getElementById("btnInsertNew").style.opacity = 0.5;
+                            document.getElementById("btnInsertNew").disabled = true; 
+                
+                            globalThis.products=[];
+                            document.getElementById('result').innerHTML = 
+                            "<p style='color:red'>Неуспешно вчитан фајл од средства</p>"; 
+                        } else{
+                            globalThis.locations=[];
+                            document.getElementById('result').innerHTML = 
+                            "<p style='color:red'>Неуспешно вчитан фајл од локации</p>";      
                         }
                     }
-                    reader.readAsArrayBuffer(file);
-                }else{
-                    document.getElementById("btnInsertNew").style.opacity = 0.5;
-                    document.getElementById("btnInsertNew").disabled = true; 
-                    globalThis.products=[];
-                    document.getElementById('result').innerHTML = 
-                    "<p style='color:red'>Неуспешно вчитан фајл од средства</p>"; 
-                }
+                    }, function(error){
+                        alert(error);
+                    })
                 }, function(error){
-                    alert(error);
-                })
-            }, function(error){
-                alert(error)
-            }, function(){
-                alert(error)
-            });
-         })
-        }
+                    alert(error)
+                }, function(){
+                    alert(error)
+                });
+             })
+            }
 
     document.getElementById('btnSaveOnDisk').addEventListener('click', function() {
         if(globalThis.newProductArray.length>0){
@@ -455,8 +582,7 @@ document.getElementById('btnYes').addEventListener('click',function(){
 function writeFile(){
     window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory, function(directoryEntry) {
         // alert(directoryEntry.toURL());
-
-        directoryEntry.getFile("result.txt", { create: true }, function(fileEntry) {
+        directoryEntry.getFile("Popis_"+new Date().getFullYear().toString() +".txt", { create: true }, function(fileEntry) {
             fileEntry.createWriter(function(fileWriter) {
                // fileWriter.onwriteend = function() {
                  //   alert("File saved successfully.");
@@ -467,8 +593,9 @@ function writeFile(){
               //  };
               var lines = [];
               globalThis.newProductArray.forEach(function(line){
+                
             //    alert((line.code+";"+line.barcode+";"+line.name).toString());
-                lines.push((line.code+";"+line.barcode+";"+line.name).toString())
+                lines.push((line.code+";"+line.barcode+";"+line.name + ";" + line.dateTimesString).toString())
               });
               var data = lines.join('\n');
             //   alert(data);
@@ -493,6 +620,13 @@ document.getElementById('menuToShow').addEventListener('click', function() {
     document.getElementById('custom-dialog').style.display = 'block';
     document.getElementById("homePage").style.display = "none";
     document.getElementById("Reviews").style.display = "none";
+    if(globalThis.products.length>0 && globalThis.locations.length>0){
+    document.getElementById('btnReview').disabled= false;
+    document.getElementById('btnReview').style.opacity = 1;
+    }else{
+        document.getElementById('btnReview').disabled =true;
+        document.getElementById('btnReview').style.opacity = 0.5;
+    }
     if(globalThis.newProductArray.length>0){
         document.getElementById('btnReset').disabled = false;
         document.getElementById('btnReset').style.opacity = 1;

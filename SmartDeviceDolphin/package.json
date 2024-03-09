@@ -26,6 +26,7 @@
     "cordova-plugin-filepath": "^1.6.0",
     "cordova-plugin-filepicker": "^1.1.6",
     "cordova-plugin-inappbrowser": "^6.0.0",
+    "cordova.plugins.diagnostic": "^7.1.4",
     "phonegap-plugin-barcodescanner": "^8.1.0"
   },
   "cordova": {
@@ -44,7 +45,8 @@
       "cordova-plugin-filechooser": {},
       "com-darryncampbell-cordova-plugin-intent": {},
       "cordova-plugin-filepicker": {},
-      "cordova-plugin-filepath": {}
+      "cordova-plugin-filepath": {},
+      "cordova.plugins.diagnostic": {}
     }
   },
   "dependencies": {

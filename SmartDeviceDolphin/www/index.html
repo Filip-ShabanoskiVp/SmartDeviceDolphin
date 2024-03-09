@@ -71,6 +71,7 @@
             <div>
                 <div id="custom-dialog" style="display: none;">
                     <button id="btnLoad" class="btn btn-primary btn-lg btn-block">Вчитај фајл со средства од диск</button><br>
+                    <button id="btnLoadLocations"  class="btn btn-primary  btn-lg btn-block">Вчитај фајл со локации од диск</button><br>
                     <button id="btnReview"  class="btn btn-primary  btn-lg btn-block">Прегледи</button><br>
                     <button id="btnReset"  class="btn btn-primary  btn-lg btn-block">Ресетирај попис на ново</button><br>
                     <button id="btnSaveOnDisk"  class="btn btn-primary  btn-lg btn-block">Запиши попис на диск</button><br>
@@ -85,6 +86,10 @@
                     <input class="form-control" type="text" name="shifra"  id="shifra"/>
                     <label>Назив</label>
                     <textarea id="naziv" class="form-control"></textarea><br>
+                    <select id="lokacija" class="form-control">
+                        <option>ОПШТ СЕКТОР</option>
+                        <option>САЛА</option>
+                    </select><br>
                     <button class="btn btn-primary" id="insertNew">Внеси во попис како ново</button>
                     <button style="margin-top: 5px;" id="insertClose" class="btn btn-danger">Излез</button>
                 </div>
@@ -117,8 +122,8 @@
                 <div class="col card">
                     <div class="card-content">
                         <p>Дали навистина сакате да го ресетирате фајлот за попис и да започнете на ново</p>
+                        <button class="btn btn-danger" id="btnNo">Не</button>
                         <button class="btn btn-primary" id="btnYes">Да</button>
-                        <button class="btn btn-primary" id="btnNo">Не</button>
                     </div>
                 </div>
             </div>
@@ -156,6 +161,7 @@
                     <tr>
                         <th>Шифра</th>
                         <th>Назив</th>
+                        <th>Локација</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -172,7 +178,6 @@
         <script src="cordova.js"></script>
         <script src="js/index.js"></script>
         <script>
-           
             var customDialog = document.getElementById('custom-dialog');
             var btnLoad = document.getElementById('btnLoad');
             var btnReview = document.getElementById('btnReview');
@@ -181,14 +186,23 @@
             var btnSretstva = document.getElementById('btnSretstva');
             var btnClose = document.getElementById('btnClose');
             var customdDialogIsertNew = document.getElementById("custom-dialogIsert");
+            var btnLoadLocations = document.getElementById('btnLoadLocations');
     
             
             btnLoad.addEventListener('click', function() {
-              fileWithOpener();
+                fileWithOpener('products')
               document.getElementById("Reviews").style.display = "none";
               document.getElementById("homePage").style.display = "block";
               document.getElementById("custom-dialog").style.display = "none";
             });
+
+
+            btnLoadLocations.addEventListener('click', function() {
+                fileWithOpener('locations')
+                document.getElementById("Reviews").style.display = "none";
+                document.getElementById("homePage").style.display = "block";
+                document.getElementById("custom-dialog").style.display = "none";
+              });
             
             btnReview.addEventListener('click', function() {
                 customDialog.style.display = 'none';
@@ -217,6 +231,11 @@
                 document.getElementById("menuToShow").style.display = "none";
                 document.getElementById("homePage").style.display = "none";
                 customdDialogIsertNew.style.display = "block";
+                if(globalThis.locations.length > 0){
+                    document.getElementById("lokacija").style.display = "block";  
+                }else {
+                    document.getElementById("lokacija").style.display = "none";
+                }
             });
 
             
