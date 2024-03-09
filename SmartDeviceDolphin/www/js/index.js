@@ -28,8 +28,8 @@ var locations = [];
 
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
-    // readFileFromInternalStorage("products");
-    // readFileFromInternalStorage("locations");
+    readFileFromInternalStorage("products");
+    readFileFromInternalStorage("locations");
 
     btnScanner();  
     searchBtn();
@@ -296,7 +296,7 @@ function displayProducts(){
 }
 
 function displayLocations(){
-    if(globalThis.locations.length > 0) {
+    document.getElementById("lokacija").innerHTML = "";
         var selectLocationList = "";
         selectLocationList = document.getElementById("lokacija");
         globalThis.locations.forEach(function(location) {
@@ -305,9 +305,6 @@ function displayLocations(){
             option.value = location.code;
             selectLocationList.appendChild(option);
         })
-    }else {
-        document.getElementById("lokacija").innerHTML = "";
-    }
 }
 
 function btnConfirm(){
@@ -344,7 +341,7 @@ function Confirm(){
         if (globalThis.newProductArray.length === 0) {
             codeToAdd = "000000";
         } else {
-            let lastItem = parseInt(globalThis.newProductArray[globalThis.newProductArray.length - 1].code, 10);;
+            let lastItem = parseInt(globalThis.newProductArray[globalThis.newProductArray.length - 1].code, Infinity);;
             if(isNaN(lastItem)) {
                 lastItem = 0;
             }
@@ -469,7 +466,7 @@ document.getElementById('insertNew').addEventListener('click',function(){
                 if (globalThis.newProductArray.length === 0) {
                     codeToAdd = "000000";
                 } else {
-                    let lastItem = parseInt(globalThis.newProductArray[globalThis.newProductArray.length - 1].code, 10);;
+                    let lastItem = parseInt(globalThis.newProductArray[globalThis.newProductArray.length - 1].code, Infinity);;
                     if(isNaN(lastItem)) {
                         lastItem = 0;
                     }
@@ -480,7 +477,7 @@ document.getElementById('insertNew').addEventListener('click',function(){
                 if( globalThis.locations.length > 0) {
 
                     globalThis.newProductArray.push({
-                        code: codeToAdd,
+                        code: codeToAdd.toString(),
                         barcode: barcodeNew,
                         name: naziv,
                         codeLocation:location,
@@ -774,20 +771,49 @@ function displayNewProducts(){
                 locationName = location.name;
             }
 
-            // displayLocationsChange();
-            return `<tr><td>${product.code}</td><td>${product.name}</td><td>${product.codeLocation}</td>
-            <td>${locationName}</td> <td>${product.dateTimesString}</td><td>
-            <select id='lokacijaPromeni' class="form-control"></select></td>
-            <td><button class='btn btn-danger' onclick="deleteReview(${product.barcode})">Избриши</button</td></tr>`;
+            return `<tr><td>${product.code.toString()}</td><td>${product.name}</td><td>${product.codeLocation}</td>
+            <td>${locationName}</td> <td>${product.dateTimesString}</td>
+            <td class='lokacijaPromeni'></div></td>
+            <td><button class='btn btn-danger' onclick="deleteReview(${product.code})">Избриши</button</td></tr>`;
         }).join('');
+        displayLocationsForNewReviews()
     }else{
         document.querySelector("#productsTable tbody").innerHTML = "";
     }
 }
+function displayLocationsForNewReviews(){
+    var tds = document.querySelectorAll('.lokacijaPromeni');
+    tds.forEach(td => {
+        var select = document.createElement('select');
+        select.className = "form-control"
+        select.addEventListener("change", function() {
+            UpdateLocation(this.value,td.parentNode);
+        })
+        select.id = "locationSelects";
 
-function deleteReview(barcode){
-    var nova = globalThis.newProductArray.filter(p=>p.barcode!=barcode);
-    globalThis.newProductArray = [...nova];
+        globalThis.locations.forEach(function(location) {
+            var option = document.createElement('option');
+            option.value = location.code;
+            option.text = location.name;
+            select.appendChild(option);
+    })
+    td.appendChild(select);
+})
+
+}
+
+function UpdateLocation(selectedCode, row){
+    var selectedLocation = globalThis.locations.find(location=>location.code == selectedCode);
+    if(selectedLocation) {
+        row.cells[2].innerText = selectedLocation.code;
+        row.cells[3].innerText = selectedLocation.name;
+    } 
+}
+
+
+function deleteReview(code){
+    var nova = globalThis.newProductArray.indexOf(code);
+    globalThis.newProductArray.splice(nova,1);
     if(globalThis.newProductArray.length==0){
         document.getElementById('result').innerHTML = "<p style='color:green'>Нов попис е ресетиран!</p>";
     }else{
@@ -800,28 +826,5 @@ function deleteReview(barcode){
 }
 
 
-function displayLocationsChange() {
-    alert("Displaying locations change");
-    alert("Number of locations:", globalThis.locations.length);
-    var selectLocationList = document.getElementById("lokacijaPromeni");
-    alert("Select element:", selectLocationList);
-    if (globalThis.locations.length > 0 && selectLocationList) {
-        alert.log("Inside if condition");
-        selectLocationList.innerHTML = ""; // Clear the select options
-        globalThis.locations.forEach(function(location) {
-            console.log("Appending option for location:", location);
-            var option = document.createElement('option');
-            option.text = location.name;
-            option.value = location.code;
-            selectLocationList.appendChild(option);
-        });
-    } else {
-        alert("No locations or select element not found");
-        // Handle the case when there are no locations or select element is not found
-        if (selectLocationList) {
-            selectLocationList.innerHTML = ""; // Clear the select options
-        }
-    }
-}
 
 
