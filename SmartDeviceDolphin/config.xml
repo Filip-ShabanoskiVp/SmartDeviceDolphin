@@ -8,5 +8,5 @@
     <content src="index.html" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
-    <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+    <!-- <preference name="AndroidPersistentFileLocation" value="Compatibility" /> -->
 </widget>

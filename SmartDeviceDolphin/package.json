@@ -14,43 +14,28 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@red-mobile/cordova-plugin-barcodescanner": "^9.1.0",
-    "android": "^0.0.8",
-    "com-darryncampbell-cordova-plugin-intent": "^2.2.0",
-    "cordova": "^12.0.0",
     "cordova-android": "^12.0.1",
-    "cordova-plugin-barcodescanner": "^0.7.4",
+    "cordova-plugin-android-permissions": "^1.1.5",
     "cordova-plugin-compat": "^1.2.0",
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-file": "^8.0.1",
-    "cordova-plugin-filechooser": "^1.2.0",
+    "cordova-plugin-filechooser": "github:ihadeed/cordova-filechooser",
     "cordova-plugin-filepath": "^1.6.0",
-    "cordova-plugin-filepicker": "^1.1.6",
-    "cordova-plugin-inappbrowser": "^6.0.0",
-    "cordova.plugins.diagnostic": "^7.1.4",
-    "phonegap-plugin-barcodescanner": "^8.1.0"
+    "cordova-plugin-inappbrowser": "^6.0.0"
   },
   "cordova": {
+    "plugins": {
+      "cordova-plugin-filepath": {},
+      "cordova-plugin-filechooser": {},
+      "cordova-plugin-inappbrowser": {},
+      "cordova-plugin-file": {},
+      "cordova-plugin-dialogs": {},
+      "cordova-plugin-compat": {},
+      "@red-mobile/cordova-plugin-barcodescanner": {},
+      "cordova-plugin-android-permissions": {}
+    },
     "platforms": [
       "android"
-    ],
-    "plugins": {
-      "phonegap-plugin-barcodescanner": {
-        "ANDROID_SUPPORT_V4_VERSION": "27.+"
-      },
-      "cordova-plugin-dialogs": {},
-      "cordova-plugin-inappbrowser": {},
-      "cordova-plugin-barcodescanner": {},
-      "@red-mobile/cordova-plugin-barcodescanner": {},
-      "cordova-plugin-file": {},
-      "cordova-plugin-filechooser": {},
-      "com-darryncampbell-cordova-plugin-intent": {},
-      "cordova-plugin-filepicker": {},
-      "cordova-plugin-filepath": {},
-      "cordova.plugins.diagnostic": {}
-    }
-  },
-  "dependencies": {
-    "encoding-japanese": "^2.0.0",
-    "jschardet": "^3.0.0"
+    ]
   }
 }

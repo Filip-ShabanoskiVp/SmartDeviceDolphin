@@ -152,9 +152,14 @@
             <div class="row card-container" id="Reviews" style="display: none;position:relative;right:5px">
                 <div class="col card">
                     <div class="card-content">
-                        <h3>Преглед - Пописна Листа</h3>
+                              <h3>Преглед - Пописна Листа</h3>
+                              <div class="containerSearch"> 
+                                <input type="text" id="searchVal" class="form-control" style="margin-left: 10px;" placeholder="Пребарување">
+                                <button class="btn btn-success" id="btnPorductSearch">Пребарај</button>   
+                                <button class="btn btn-warning" id="btnProductClear">Исчисти</button>
+                              </div>
                         <hr/>
-                         <div class="table-responsive" style=" height:400px;overflow:auto;">
+                         <div class="table-responsive" style=" height:400px;overflow:auto;" id="tableProducts">
                             <table class="table table-striped" id="productsTable">
                                 <thead>
                                     <tr>
@@ -174,7 +179,13 @@
          <div class="row card-container" id="ReviewsNew" style="display: none;position:relative;right:5px">
             <div class="col card">
                 <div class="card-content">
+                    <div id="resultReviewsNew"></div>
                     <h3>Преглед - Попис нов Листа</h3>
+                    <div class="containerSearch"> 
+                        <input type="text" id="searchNewVal" class="form-control" style="margin-left: 10px;" placeholder="Пребарување">
+                        <button class="btn btn-success" id="btnPorductNewSearch">Пребарај</button>   
+                        <button class="btn btn-warning" id="btnProductNewClear">Исчисти</button>
+                    </div>
                     <hr/>
                      <div class="table-responsive" style=" height:400px;overflow:auto;">
                         <table class="table table-striped" id="productsNewTable">
@@ -204,6 +215,7 @@
         <script src="cordova.js"></script>
         <script src="js/index.js"></script>
         <script>
+           // fileWithOpener("ssss");
             var customDialog = document.getElementById('custom-dialog');
             var btnLoad = document.getElementById('btnLoad');
             var btnReview = document.getElementById('btnReview');

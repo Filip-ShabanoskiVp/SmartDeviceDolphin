@@ -28,8 +28,8 @@ var locations = [];
 
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
-    readFileFromInternalStorage("products");
-    readFileFromInternalStorage("locations");
+    // readFileFromInternalStorage("products");
+    // readFileFromInternalStorage("locations");
 
     btnScanner();  
     searchBtn();
@@ -155,10 +155,13 @@ function Search(){
 
 function readFileFromInternalStorage(type) {
     var path = "";
+    var fileName = "";
     if(type=='products') {
         path = "www/Popis_Shifrarnik_2024.txt";
+        fileName = "Popis_Shifrarnik_2024.txt";
     } else {
         path = "www/Lokacii_2024.txt";
+        fileName = "Lokacii_2024.txt";
     }
     window.resolveLocalFileSystemURL(cordova.file.applicationDirectory
      + path,function(fileEntry){
@@ -182,9 +185,8 @@ function readFileFromInternalStorage(type) {
 
                     content  = new TextDecoder("utf-8").decode(content);
 
-
                     var lines = content.split('\n');
-                    
+
                     lines.forEach(function (line) {
                         line = line.trim();
 
@@ -203,12 +205,12 @@ function readFileFromInternalStorage(type) {
                     } else {
                         if(/^[^;]+;[^;]+$/.test(line)){
                             line = line.split(";");
-                            if(line[1]!="..."){
+                            // if(line[1]!="..."){
                                 globalThis.locations.push({
                                     code: line[0],
                                     name: line[1],
                                 });
-                            }
+                            // }
                          }
                     }
                 })
@@ -278,22 +280,51 @@ function isUTF8Encoded(bytes) {
 }
 
 
-function displayProducts(){
+function displayProducts(value=''){
 
     if(globalThis.products.length>0){
-
-    document.querySelector("#productsTable tbody").innerHTML = globalThis.products.map(product => {
-        var locationName = '';
-        var location = globalThis.locations.find(location=>location.code == product.codeLocation);
-        if(location) {
-            locationName = location.name;
+        if(value!=''){
+            document.querySelector("#productsTable tbody").innerHTML = globalThis.products.filter(p=>p.code==value ||
+                 p.name.toLowerCase()==value.toLowerCase() ||
+                   globalThis.locations.
+                   find(location=>location.code == p.codeLocation).name.toLowerCase()==value.toLocaleLowerCase())
+                   .map(product => {
+                    
+                var locationName = '';
+                var location = globalThis.locations.find(location=>location.code == product.codeLocation);
+                if(location) {
+                    locationName = location.name;
+                }
+                return `<tr><td>${product.code}</td><td>${product.name}</td><td>${product.codeLocation=='000' ? 'Нема локација'
+                : locationName}</td></tr>`;
+             }).join('');
+        }else {
+            document.querySelector("#productsTable tbody").innerHTML = globalThis.products.map(product => {
+                var locationName = '';
+                var location = globalThis.locations.find(location=>location.code == product.codeLocation);
+                if(location) {
+                    locationName = location.name;
+                }
+                return `<tr><td>${product.code}</td><td>${product.name}</td><td>${product.codeLocation=='000' ? 'Нема локација'
+                : locationName}</td></tr>`;
+             }).join('');
         }
-        return `<tr><td>${product.code}</td><td>${product.name}</td><td>${locationName}</td></tr>`;
-     }).join('');
     }else{
         document.querySelector("#productsTable tbody").innerHTML = "";
     }
+    document.getElementById('searchVal').value = "";
 }
+
+document.getElementById('btnPorductSearch').addEventListener('click',function(){
+    var value = document.getElementById('searchVal').value;
+    displayProducts(value);
+},false)
+
+
+document.getElementById('btnProductClear').addEventListener('click',function(){
+    displayProducts();
+},false)
+
 
 function displayLocations(){
     document.getElementById("lokacija").innerHTML = "";
@@ -313,7 +344,7 @@ function btnConfirm(){
 }
 
 function Confirm(){
-    if(globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm)!=""){
+    if(globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).length > 0){
 
         var datum = new Date();
         var day = datum.getDay().toString().padStart(2,'0');
@@ -349,22 +380,32 @@ function Confirm(){
             codeToAdd = lastItem.toString().padStart(6, "0"); // Pad with leading zeros
         }
         if(globalThis.locations.length > 0) {
+            
+            var product = globalThis.products.find(p=>p.barcode==globalThis.ValueToConfirm);
+            var codeLocation = product.codeLocation;
+
             globalThis.newProductArray.push({
-                code:codeToAdd,
+                code:codeToAdd.toString(),
                 barcode: globalThis.ValueToConfirm,
                 name: globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
                     return p.name;
                 }),
-                codeLocation: globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
-                    return p.codeLocation;
+                codeLocation: codeLocation,
+                nameLocation: globalThis.locations.forEach(function(loc){
+                    if(loc.code==codeLocation) {
+                        return loc.name
+                    }
                 }),
-                nameLocation: globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
-                     globalThis.locations.filter(location=>location.code==p.codeLocation).map(function(l){
-                        return l.name;
-                     });
-                }),
+                //  globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).map(function(p){
+                //      globalThis.locations.forEach(function(loc){
+                //         if(loc.code == p.codeLocation){
+                //             return loc.name;
+                //         }
+                //      });
+                // }),
                 dateTimesString: dateTimeString
             });
+            //p.codeLocation
         } else {
              globalThis.newProductArray.push({
             code: codeToAdd,
@@ -515,6 +556,7 @@ document.getElementById('insertNew').addEventListener('click',function(){
     ,false);
 
     document.getElementById('insertClose').addEventListener('click',function(){
+        document.getElementById('result').innerHTML = "";
         document.getElementById("custom-dialogIsert").style.display = "none";  
         document.getElementById("menuToShow").style.display = "block";
         document.getElementById("homePage").style.display = "block";
@@ -548,10 +590,54 @@ document.getElementById('btnYes').addEventListener('click',function(){
         document.getElementById('ReviewsNew').style.display = "none";
     },false);
 
+
+//     function chooseFile() {
+//         window.fileChooser.open(function(uri) {
+//             window.FilePath.resolveNativePath(uri, function(filePath) {
+//                 var fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+//                 alert("Selected file:", fileName);
+//             }, errorHandler);   
+//         }, errorHandler);
+//     }
+
+//     function errorHandler(error) {
+//         console.error("Error:", error.message);
+//         console.error("Error Object:", error);
+//         console.error("Stack Trace:", error.stack);
+//     }
+
+//     window.onload = function() {
+
+//         cordova.plugins.permissions.checkPermission(cordova.plugins.permissions.READ_EXTERNAL_STORAGE, function(status) {
+//             if (status.hasPermission) {
+//                 alert(1);
+//                 alert(status.hasPermission)
+//         chooseFile()
+//     } else {
+//         // Permission is not granted, request it from the user
+//         cordova.plugins.permissions.requestPermission(cordova.plugins.permissions.READ_EXTERNAL_STORAGE, function(status) {
+//             if (status.hasPermission) {
+//                 // Permission granted, proceed with accessing external storage
+//                 chooseFile();
+//             } else {
+//                 // Permission denied, handle accordingly (e.g., show error message)
+//                 alert("Permission denied to read external storage");
+//             }
+//         }, function() {
+//             // Error occurred while requesting permission
+//             alert("Error occurred while requesting permission");
+//         });
+//     }
+// }, function() {
+//     // Error occurred while checking permission
+//     alert("Error occurred while checking permission");
+// });
+//     };
+
      function fileWithOpener(type){
             window.fileChooser.open(function(uri) {
                 window.resolveLocalFileSystemURI(uri, function(fileEntry){
-                    fileEntry.file(function(file){
+                    fileEntry.file(function(file){ 
                             if(file.type === "text/plain"){
                                 var reader = new FileReader();
                                 reader.onloadend = function (evt) {
@@ -571,7 +657,6 @@ document.getElementById('btnYes').addEventListener('click',function(){
                                     if(isUTF8){
                 
                                     content  = new TextDecoder("utf-8").decode(content);
-                
                 
                                     var lines = content.split('\n');
                                     
@@ -593,12 +678,12 @@ document.getElementById('btnYes').addEventListener('click',function(){
                                         } else{
                                             if(/^[^;]+;[^;]+$/.test(line)){
                                                 line = line.split(";");
-                                                if(line[1]!="..."){
+                                                // if(line[1]!="..."){
                                                     globalThis.locations.push({
                                                         code: line[0],
                                                         name: line[1],
                                                     });
-                                                }
+                                                // }
                                              }
                                         }
                                 }   )
@@ -700,7 +785,8 @@ function writeFile(){
                 locationName = location.name;
             }
 
-            lines.push((line.code+";"+line.barcode+";"+line.name + ";" + line.codeLocation  + ";" + locationName + ";"
+            var myLocation = line.codeLocation=='000' ? 'Нема локација' + ";" : line.codeLocation + ";" + locationName + ";";
+            lines.push((line.code+";"+line.barcode+";"+line.name + ";" + myLocation
                  + line.dateTimesString).toString()) + ";";
               });
               var data = lines.join('\n');
@@ -722,6 +808,8 @@ function writeFile(){
 
 
 document.getElementById('menuToShow').addEventListener('click', function() {
+    document.getElementById('result').innerHTML='';
+    document.getElementById('resultReviewsNew').innerHTML = "";
     document.getElementById('custom-dialog').style.display = 'block';
     document.getElementById("homePage").style.display = "none";
     document.getElementById("Reviews").style.display = "none";
@@ -761,34 +849,82 @@ document.getElementById('btnPopisNov').addEventListener('click', function(){
 })
 
 
-function displayNewProducts(){
-    if(globalThis.newProductArray.length>0){
+function displayNewProducts(value='') {
+    if (globalThis.newProductArray.length > 0) {
+        if (value != '') {
+            const filterProducts = globalThis.newProductArray.filter(product => {
+                const productName = (product.name || '').toString().toLowerCase();
+                const locationName = globalThis.locations.find(location => location.code == product.codeLocation)?.name.toLowerCase() || '';
+                return (
+                    product.code == value || 
+                    productName.includes(value.toLowerCase()) || 
+                    locationName.includes(value.toLowerCase())
+                );
+            });
 
-        document.querySelector("#productsNewTable tbody").innerHTML = globalThis.newProductArray.map(product => {
-            var locationName = '';
-            var location = globalThis.locations.find(location=>location.code == product.codeLocation);
-            if(location) {
-                locationName = location.name;
-            }
+            document.querySelector("#productsNewTable tbody").innerHTML = filterProducts.map(product => {
+                var locationName = '';
+                if (product.codeLocation == '000') {
+                    locationName = '...';
+                } else {
+                    var location = globalThis.locations.find(location => location.code == product.codeLocation);
+                    if (location) {
+                        locationName = location.name;
+                    }
+                }
 
-            return `<tr><td>${product.code.toString()}</td><td>${product.name}</td><td>${product.codeLocation}</td>
-            <td>${locationName}</td> <td>${product.dateTimesString}</td>
-            <td class='lokacijaPromeni'></div></td>
-            <td><button class='btn btn-danger' onclick="deleteReview(${product.code})">Избриши</button</td></tr>`;
-        }).join('');
-        displayLocationsForNewReviews()
-    }else{
+                return `<tr>
+                    <td>${product.code.toString()}</td>
+                    <td>${product.name}</td>
+                    <td>${product.codeLocation == '000' ? 'Нема локација' : product.codeLocation }</td>
+                    <td>${product.codeLocation == '000' && locationName === '...' ? 'Нема локација' : locationName}</td>
+                    <td>${product.dateTimesString}</td>
+                    <td class='lokacijaPromeni'></td>
+                    <td><button class='btn btn-danger' onclick="deleteReview(${product.code})">Избриши</button></td>
+                </tr>`;
+            }).join('');
+
+            // Call displayLocationsForNewReviews with both newProductArray and filterProducts
+            displayLocationsForNewReviews(globalThis.newProductArray, filterProducts);
+        } else {
+            document.querySelector("#productsNewTable tbody").innerHTML = globalThis.newProductArray.map(product => {
+                var locationName = '';
+                var location = globalThis.locations.find(location => location.code == product.codeLocation);
+                if (location) {
+                    locationName = location.name;
+                }
+
+                return `<tr>
+                    <td>${product.code.toString()}</td>
+                    <td>${product.name}</td>
+                    <td>${product.codeLocation == '000' ? 'Нема локација' : product.codeLocation }</td>
+                    <td>${locationName === '...' ? 'Нема локација' : locationName}</td>
+                    <td>${product.dateTimesString}</td>
+                    <td class='lokacijaPromeni'></td>
+                    <td><button class='btn btn-danger' onclick="deleteReview(${product.code})">Избриши</button></td>
+                </tr>`;
+            }).join('');
+
+            // Call displayLocationsForNewReviews with both newProductArray and filterProducts
+            displayLocationsForNewReviews(globalThis.newProductArray, globalThis.newProductArray);
+        }
+    } else {
         document.querySelector("#productsTable tbody").innerHTML = "";
     }
+    document.getElementById('searchNewVal').value = "";
 }
-function displayLocationsForNewReviews(){
+
+function displayLocationsForNewReviews(newProductArray, filterProducts) {
     var tds = document.querySelectorAll('.lokacijaPromeni');
-    tds.forEach(td => {
+    tds.forEach((td, index) => {
+        td.innerHTML = ''; // Clear existing content
+        var product = filterProducts[index];
         var select = document.createElement('select');
-        select.className = "form-control"
+        select.className = "form-control";
         select.addEventListener("change", function() {
-            UpdateLocation(this.value,td.parentNode);
-        })
+            UpdateLocation(this.value, td.parentNode);
+            saveChangesToNewProductArray();
+        });
         select.id = "locationSelects";
 
         globalThis.locations.forEach(function(location) {
@@ -796,34 +932,66 @@ function displayLocationsForNewReviews(){
             option.value = location.code;
             option.text = location.name;
             select.appendChild(option);
-    })
-    td.appendChild(select);
-})
+        });
 
+        if (product) {
+            var productIndex = newProductArray.findIndex(prod => prod.code === product.code);
+            var selectedIndex = globalThis.locations.findIndex(location => location.code === newProductArray[productIndex].codeLocation);
+            if (selectedIndex !== -1) {
+                select.selectedIndex = selectedIndex;
+            }
+        }
+        td.appendChild(select);
+    });
 }
 
 function UpdateLocation(selectedCode, row){
     var selectedLocation = globalThis.locations.find(location=>location.code == selectedCode);
     if(selectedLocation) {
-        row.cells[2].innerText = selectedLocation.code;
-        row.cells[3].innerText = selectedLocation.name;
+        row.cells[2].innerText = selectedLocation.code=='000' ? 'Нема локација' : selectedLocation.code;
+        row.cells[3].innerText = selectedLocation.code=='000' ? 'Нема локација' : selectedLocation.name;
+
+        var rowIndex = Array.from(row.parentNode.children).indexOf(row); // Get the index of the row
+        globalThis.newProductArray[rowIndex].codeLocation = selectedLocation.code;
     } 
+}
+
+function saveChangesToNewProductArray() {
+    console.log(globalThis.newProductArray);
 }
 
 
 function deleteReview(code){
-    var nova = globalThis.newProductArray.indexOf(code);
-    globalThis.newProductArray.splice(nova,1);
+    var productIndex = globalThis.newProductArray.findIndex(product=>product.code==code);
+    var product = globalThis.newProductArray.find(product=>product.code==code);
+
+    globalThis.newProductArray.splice(productIndex,1);
     if(globalThis.newProductArray.length==0){
         document.getElementById('result').innerHTML = "<p style='color:green'>Нов попис е ресетиран!</p>";
+        document.getElementById("ReviewsNew").style.display = 'none';
+        document.getElementById("menuToShow").style.display = "block";
+        document.getElementById("homePage").style.display = "block";
+        document.getElementById('resultReviewsNew').innerHTML = "";
     }else{
-    document.getElementById('result').innerHTML = "<p style='color:green'>Пописот е избришан од листата на нов попис!</p>";
+    document.getElementById('resultReviewsNew').innerHTML = `<p style='color:green'>Пописот ${product.name} 
+    е избришан од листата на нов попис!</p>`;
+    displayNewProducts()
     }
-    document.getElementById("ReviewsNew").style.display = 'none';
-    document.getElementById("menuToShow").style.display = "block";
-    document.getElementById("homePage").style.display = "block";
 
 }
+
+
+document.getElementById('btnPorductNewSearch').addEventListener('click',function(){
+    var value = document.getElementById('searchNewVal').value;
+    displayNewProducts(value)
+},false)
+
+
+document.getElementById('btnProductNewClear').addEventListener('click',function(){
+    displayNewProducts()
+},false)
+
+
 
 
 

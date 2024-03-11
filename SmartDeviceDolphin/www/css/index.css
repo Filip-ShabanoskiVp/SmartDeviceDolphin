@@ -94,3 +94,8 @@
     border: 1px solid #ccc;
     z-index: 1000;
   }
+
+  .containerSearch {
+    display: flex;
+    align-items: center;
+  }
