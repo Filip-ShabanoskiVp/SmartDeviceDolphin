@@ -120,9 +120,21 @@
             <div class="card-container" style="width: 300px;">
                 <div class="col card">
                     <div class="card-content">
-                        <p>Дали навистина сакате да го ресетирате фајлот за попис и да започнете на ново</p>
+                        <p>Дали навистина сакате да го ресетирате фајлот за нов попис и да започнете на ново ?</p>
                         <button class="btn btn-danger" id="btnNo">Не</button>
                         <button class="btn btn-primary" id="btnYes">Да</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div id="confirmDeleteAlert" style="display: none;position: absolute;z-index: 15;top: 35%;
+            left: 50%; margin: -100px 0 0 -150px;">
+            <div class="card-container" style="width: 300px;">
+                <div class="col card">
+                    <div class="card-content">
+                        <p>Дали навистина сакате да го избришите средството од нов попис ?</p>
+                        <button class="btn btn-danger" id="btnNoDelete">Не</button>
+                        <button class="btn btn-primary" id="btnYesDelete">Да</button>
                     </div>
                 </div>
             </div>
@@ -152,7 +164,7 @@
             <div class="row card-container" id="Reviews" style="display: none;position:relative;right:5px">
                 <div class="col card">
                     <div class="card-content">
-                              <h3>Преглед - Пописна Листа</h3>
+                              <h3 id="yearReview"></h3>
                               <div class="containerSearch"> 
                                 <input type="text" id="searchVal" class="form-control" style="margin-left: 10px;" placeholder="Пребарување">
                                 <button class="btn btn-success" id="btnPorductSearch">Пребарај</button>   

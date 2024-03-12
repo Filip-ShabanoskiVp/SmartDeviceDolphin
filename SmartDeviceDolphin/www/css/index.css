@@ -1,4 +1,5 @@
 
+
   .navbar {
     overflow: hidden;
     background-color: #333;
@@ -52,6 +53,7 @@
     display: block;
   }
 
+  
   .card-container {
     display: flex;
     justify-content: center;
@@ -68,6 +70,45 @@
   }
   .card-content {
     padding: 16px;
+    
+  }
+
+  @media screen and (orientation: landscape) {
+    #custom-dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border: 1px solid #ccc;
+      z-index: 1000;
+    }
+  
+    #custom-dialog button {
+      height: 45px;
+      width: 375px;
+    }
+    
+  }
+
+  @media screen and (orientation: portrait) {
+    #custom-dialog {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      border: 1px solid #ccc;
+      z-index: 1000;
+    }
+  
+    #custom-dialog button {
+      height: 45px;
+      width: 375px;
+    }
+    
   }
 
 
@@ -82,6 +123,11 @@
     padding: 20px;
     border: 1px solid #ccc;
     z-index: 1000;
+  }
+
+  #custom-dialog button {
+    height: 45px;
+    width: 375px;
   }
 
   #custom-dialogIsert{

@@ -25,6 +25,8 @@ var products = [];
 var ValueToConfirm = "";
 var newProductArray = [];
 var locations = [];
+var getYear="";
+var codeToDelete=undefined;
 
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
@@ -33,10 +35,34 @@ function onDeviceReady() {
 
     btnScanner();  
     searchBtn();
-    btnConfirm()  
-    
+    btnConfirm();
+
+
+        
 }
 
+
+// document.getElementById('b1').addEventListener('click', function(){
+//     alert(1);
+//     window.fileChooser.open(function(uri) {
+//         window.FilePath.resolveNativePath(uri, function(filePath) {
+//             alert(filePath);
+//             var filename = filePath.split('/').pop();
+//             alert(2);
+//             alert(filename);
+//           }, function(error){
+//             console.log("Error resolving native path: ", error);
+//             alert("Error resolving native path: " + JSON.stringify(error));
+//           });
+//     }, function(error){
+//         console.log("Error selecting file: ", error);
+//         alert("Error selecting file: " + JSON.stringify(error));
+//     });
+//     alert(3);
+// }, function(error){
+//     console.log("Error adding event listener: ", error);
+//     alert("Error adding event listener: " + JSON.stringify(error));
+// });
 
 function btnScanner(){
     let btn = document.getElementById('btnScan');
@@ -216,16 +242,17 @@ function readFileFromInternalStorage(type) {
                 })
 
                 if(type=='products'){
+                    globalThis.getYear = fileName.substring(fileName.lastIndexOf("_")+1,fileName.lastIndexOf("."));
                     document.getElementById('result').innerHTML = ""; 
-                    document.getElementById('result').innerHTML = 
-                    "<p style='color:green'>Успечно вчитан фајл од средства</p>";
+                    document.getElementById('result').innerHTML =
+                    "<p style='color:green'>Успечно вчитан фајл од средства од  "+ globalThis.getYear +" година</p>";
                 }else{
+                    globalThis.getYear = fileName.substring(fileName.lastIndexOf("_")+1,fileName.lastIndexOf("."));
                     document.getElementById('result').innerHTML = ""; 
                     document.getElementById('result').innerHTML = 
-                    "<p style='color:green'>Успечно вчитан фајл од локации</p>";
+                    "<p style='color:green'>Успечно вчитан фајл од локации од "+ globalThis.getYear +" година</p>";
                 }
             }else{
-
                 if(type=='products'){
                     document.getElementById("btnInsertNew").style.opacity = 0.5;
                     document.getElementById("btnInsertNew").disabled = true; 
@@ -282,8 +309,10 @@ function isUTF8Encoded(bytes) {
 
 function displayProducts(value=''){
 
+    document.getElementById('yearReview').innerText =  "Преглед - Пописна Листа од "+ globalThis.getYear + " година";
     if(globalThis.products.length>0){
         if(value!=''){
+
             document.querySelector("#productsTable tbody").innerHTML = globalThis.products.filter(p=>p.code==value ||
                  p.name.toLowerCase()==value.toLowerCase() ||
                    globalThis.locations.
@@ -347,7 +376,8 @@ function Confirm(){
     if(globalThis.products.filter(p=>p.barcode==globalThis.ValueToConfirm).length > 0){
 
         var datum = new Date();
-        var day = datum.getDay().toString().padStart(2,'0');
+
+        var day = datum.getDate().toString().padStart(2,'0');
         var month  = (datum.getMonth() + 1).toString().padStart(2,'0');
         var year = datum.getFullYear().toString();
         var hours =  datum.getHours().toString().padStart(2,'0');
@@ -483,7 +513,7 @@ document.getElementById('insertNew').addEventListener('click',function(){
                 document.getElementById('ReviewsNew').style.display = "none";
             }else {
                 var datum = new Date();
-                var day = datum.getDay().toString().padStart(2,'0');
+                var day = datum.getDate().toString().padStart(2,'0');
                 var month  = (datum.getMonth() + 1).toString().padStart(2,'0');
                 var year = datum.getFullYear().toString();
                 var hours =  datum.getHours().toString().padStart(2,'0');
@@ -572,6 +602,7 @@ document.getElementById('btnReset').addEventListener('click', function() {
     document.getElementById('ReviewsNew').style.display = "none";
 });
 
+
 document.getElementById('btnYes').addEventListener('click',function(){
     globalThis.newProductArray = [];
     document.getElementById('result').innerHTML = "<p style='color:green'>Нов попис е ресетиран!</p>";
@@ -591,53 +622,61 @@ document.getElementById('btnYes').addEventListener('click',function(){
     },false);
 
 
-//     function chooseFile() {
-//         window.fileChooser.open(function(uri) {
-//             window.FilePath.resolveNativePath(uri, function(filePath) {
-//                 var fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-//                 alert("Selected file:", fileName);
-//             }, errorHandler);   
-//         }, errorHandler);
-//     }
+    // function chooseFile() {
+    //     window.fileChooser.open(function(uri) {
+    //         window.FilePath.resolveNativePath(uri, function(filePath) {
+    //             var fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+    //             alert("Selected file:", fileName);
+    //         }, errorHandler);   
+    //     }, errorHandler);
+    // }
 
-//     function errorHandler(error) {
-//         console.error("Error:", error.message);
-//         console.error("Error Object:", error);
-//         console.error("Stack Trace:", error.stack);
-//     }
+    // function errorHandler(error) {
+    //     console.error("Error:", error.message);
+    //     console.error("Error Object:", error);
+    //     console.error("Stack Trace:", error.stack);
+    // }
 
-//     window.onload = function() {
+    // window.onload = function() {
 
-//         cordova.plugins.permissions.checkPermission(cordova.plugins.permissions.READ_EXTERNAL_STORAGE, function(status) {
-//             if (status.hasPermission) {
-//                 alert(1);
-//                 alert(status.hasPermission)
-//         chooseFile()
-//     } else {
-//         // Permission is not granted, request it from the user
-//         cordova.plugins.permissions.requestPermission(cordova.plugins.permissions.READ_EXTERNAL_STORAGE, function(status) {
-//             if (status.hasPermission) {
-//                 // Permission granted, proceed with accessing external storage
-//                 chooseFile();
-//             } else {
-//                 // Permission denied, handle accordingly (e.g., show error message)
-//                 alert("Permission denied to read external storage");
-//             }
-//         }, function() {
-//             // Error occurred while requesting permission
-//             alert("Error occurred while requesting permission");
-//         });
-//     }
-// }, function() {
-//     // Error occurred while checking permission
-//     alert("Error occurred while checking permission");
-// });
-//     };
+    //     cordova.plugins.permissions.checkPermission(cordova.plugins.permissions.READ_EXTERNAL_STORAGE, function(status) {
+    //         if (status.hasPermission) {
+    //             // Permission is granted, proceed with accessing external storage
+    //             chooseFile();
+    //         } else {
+    //             // Permission is not granted, request it from the user
+    //             cordova.plugins.permissions.requestPermission(cordova.plugins.permissions.READ_EXTERNAL_STORAGE, function(status) {
+    //                 if (status.hasPermission) {
+    //                     // Permission granted, proceed with accessing external storage
+    //                     chooseFile();
+    //                 } else {
+    //                     // Permission denied, provide guidance to the user
+    //                     alert("Permission denied to read external storage. You can grant the permission manually from the app settings.");
+    //                 }
+    //             }, function() {
+    //                 // Error occurred while requesting permission
+    //                 alert("Error occurred while requesting permission");
+    //             });
+    //         }
+    //     }, function() {
+    //         // Error occurred while checking permission
+    //         alert("Error occurred while checking permission");
+    //     });
+    // }
 
      function fileWithOpener(type){
-            window.fileChooser.open(function(uri) {
+            window.fileChooser.open({ "mime": "text/plain" } ,function(uri) {
+                var filename = "";
+                var fileError="";
+                window.FilePath.resolveNativePath(uri, function(filePath) {
+                    filename = filePath.split('/').pop();
+                    // alert(filename);
+                  }, function(error){
+                    // alert("Error resolving native path: " + JSON.stringify(error));
+                    fileError = "Погрешно избрана патека за датотеката";
+                  });
                 window.resolveLocalFileSystemURI(uri, function(fileEntry){
-                    fileEntry.file(function(file){ 
+                    fileEntry.file(function(file){  
                             if(file.type === "text/plain"){
                                 var reader = new FileReader();
                                 reader.onloadend = function (evt) {
@@ -689,12 +728,36 @@ document.getElementById('btnYes').addEventListener('click',function(){
                                 }   )
                                 if(type=='products'){
                                     document.getElementById('result').innerHTML = ""; 
-                                    document.getElementById('result').innerHTML = 
-                                    "<p style='color:green'>Успечно вчитан фајл од средства</p>";
+                                    if(globalThis.products.length > 0){
+                                        if(fileError==""){
+                                        globalThis.getYear = filename.substring(filename.lastIndexOf("_")+1,filename.lastIndexOf("."));
+                                        // alert(globalThis.getYear);
+                                        document.getElementById('result').innerHTML = 
+                                        "<p style='color:green'>Успечно вчитан фајл од средства од  "+ globalThis.getYear +" година</p>";
+                                        } else{
+                                            globalThis.products=[];
+                                            document.getElementById('result').innerHTML = "<p style='color:red'>" + fileError + "</p>"    
+                                        }
+                                    } else {
+                                        document.getElementById('result').innerHTML = 
+                                    "<p style='color:red'>Вчитан е не соодветен фајл!</p>";
+                                    }
                                 }else{
                                     document.getElementById('result').innerHTML = ""; 
-                                    document.getElementById('result').innerHTML = 
-                                    "<p style='color:green'>Успечно вчитан фајл од локации</p>";
+                                    if(globalThis.locations.length > 0){
+                                        if(fileError==""){
+                                        globalThis.getYear = filename.substring(filename.lastIndexOf("_")+1,filename.lastIndexOf("."));
+                                        // alert(globalThis.getYear);
+                                        document.getElementById('result').innerHTML = 
+                                        "<p style='color:green'>Успечно вчитан фајл од локации од "+ globalThis.getYear +" година</p>";
+                                        }else{
+                                            globalThis.locations=[];
+                                            document.getElementById('result').innerHTML = "<p style='color:red'>" + fileError + "</p>"
+                                        }
+                                    } else {
+                                        document.getElementById('result').innerHTML = 
+                                        "<p style='color:red'>Вчитан е не соодветен фајл!</p>";  
+                                    }
                                 }
                         }else{
                             if(type=='products'){
@@ -777,6 +840,7 @@ function writeFile(){
               //      alert("Failed to save file.");
               //  };
               var lines = [];
+              lines.push("Код средство, Баркод, Назив средство, Код локација, Назив локација, Датум и време");
               globalThis.newProductArray.forEach(function(line){
                 
             var locationName
@@ -785,9 +849,9 @@ function writeFile(){
                 locationName = location.name;
             }
 
-            var myLocation = line.codeLocation=='000' ? 'Нема локација' + ";" : line.codeLocation + ";" + locationName + ";";
-            lines.push((line.code+";"+line.barcode+";"+line.name + ";" + myLocation
-                 + line.dateTimesString).toString()) + ";";
+            var myLocation = line.codeLocation=='000' ? 'Нема локација' + ", " : line.codeLocation + ", " + locationName + ", ";
+            lines.push((line.code+", "+line.barcode+", "+line.name + ", " + myLocation
+                 + line.dateTimesString).toString());
               });
               var data = lines.join('\n');
 
@@ -884,7 +948,7 @@ function displayNewProducts(value='') {
                 </tr>`;
             }).join('');
 
-            // Call displayLocationsForNewReviews with both newProductArray and filterProducts
+        
             displayLocationsForNewReviews(globalThis.newProductArray, filterProducts);
         } else {
             document.querySelector("#productsNewTable tbody").innerHTML = globalThis.newProductArray.map(product => {
@@ -905,7 +969,6 @@ function displayNewProducts(value='') {
                 </tr>`;
             }).join('');
 
-            // Call displayLocationsForNewReviews with both newProductArray and filterProducts
             displayLocationsForNewReviews(globalThis.newProductArray, globalThis.newProductArray);
         }
     } else {
@@ -917,7 +980,7 @@ function displayNewProducts(value='') {
 function displayLocationsForNewReviews(newProductArray, filterProducts) {
     var tds = document.querySelectorAll('.lokacijaPromeni');
     tds.forEach((td, index) => {
-        td.innerHTML = ''; // Clear existing content
+        td.innerHTML = ''; 
         var product = filterProducts[index];
         var select = document.createElement('select');
         select.className = "form-control";
@@ -962,23 +1025,46 @@ function saveChangesToNewProductArray() {
 
 
 function deleteReview(code){
-    var productIndex = globalThis.newProductArray.findIndex(product=>product.code==code);
-    var product = globalThis.newProductArray.find(product=>product.code==code);
+    globalThis.codeToDelete=code;
+    document.getElementById("menuToShow").style.display = "none";
+    document.getElementById('ReviewsNew').style.display = "none";
+    document.getElementById("confirmDeleteAlert").style.display = 'block';
+}
+
+
+
+document.getElementById('btnNoDelete').addEventListener('click',function(){
+    // globalThis.newProductArray = [];
+    globalThis.codeToDelete=undefined;
+    document.getElementById('resultReviewsNew').innerHTML = "";
+    document.getElementById("confirmDeleteAlert").style.display = 'none';
+    document.getElementById("menuToShow").style.display = "block";
+    document.getElementById('ReviewsNew').style.display = "block";
+    },false);
+ document.getElementById('btnYesDelete').addEventListener('click',function(){
+    var productIndex = globalThis.newProductArray.findIndex(product=>product.code==globalThis.codeToDelete);
+    var product = globalThis.newProductArray.find(product=>product.code==globalThis.codeToDelete);
 
     globalThis.newProductArray.splice(productIndex,1);
     if(globalThis.newProductArray.length==0){
+        globalThis.codeToDelete=undefined
         document.getElementById('result').innerHTML = "<p style='color:green'>Нов попис е ресетиран!</p>";
         document.getElementById("ReviewsNew").style.display = 'none';
+        document.getElementById("confirmDeleteAlert").style.display = 'none';
         document.getElementById("menuToShow").style.display = "block";
         document.getElementById("homePage").style.display = "block";
         document.getElementById('resultReviewsNew').innerHTML = "";
     }else{
-    document.getElementById('resultReviewsNew').innerHTML = `<p style='color:green'>Пописот ${product.name} 
+        document.getElementById("confirmDeleteAlert").style.display = 'none';
+        document.getElementById("menuToShow").style.display = "block";
+        document.getElementById('ReviewsNew').style.display = "block";
+        document.getElementById('resultReviewsNew').innerHTML = `<p style='color:green'>Пописот ${product.name} 
     е избришан од листата на нов попис!</p>`;
+    globalThis.codeToDelete=undefined;
     displayNewProducts()
     }
 
-}
+    },false);
 
 
 document.getElementById('btnPorductNewSearch').addEventListener('click',function(){
