@@ -44,54 +44,69 @@
             </div> 
           </div>
           <div class="container">
-            <div class="row card-container" style="display: block;position:relative;right:22px" id="homePage">
+            <div id="homePage" style="display: block;position: absolute;z-index: 15;top: 20%;
+            left: 50%; margin: -100px 0 0 -205px;">
+            <div class="card-container" style="width: 410px;">
                 <div class="col card">
                     <div class="card-content">
                         <h3>Основни Сретства</h1>
-                        <hr/>
-                        <form>
-                            <label>Баркод / Шифра на Сретства:</label> 
-                                <input class="form-control" type="text" name="barkod" id="barkod" />
-                        </form>
-                            <div style="margin-top: 10px;">
-                                <button class="btn btn-primary" id="btnScan">Скенирај</button>
-                                <button class="btn btn-info" id="btnSearch">Пребарај</button>
+                            <hr/>
+                            <form>
+                                <label>Баркод / Шифра на Сретства:</label> 
+                                    <input class="form-control" type="text" name="barkod" id="barkod" />
+                            </form>
+                                <div style="margin-top: 10px;">
+                                    <button class="btn btn-primary" id="btnScan">Скенирај</button>
+                                    <button class="btn btn-info" id="btnSearch">Пребарај</button>
+                                </div>
+                            <div id="result"></div><br><br>
+                            <div>
+                                <button disabled class="btn btn-info" style="opacity: 0.5;" id="btnConfirm">Внеси во попис / Потврди</button></div><br><br>
                             </div>
-                        <div id="result"></div><br><br>
-                        <div>
-                            <button disabled class="btn btn-info" style="opacity: 0.5;" id="btnConfirm">Внеси во попис / Потврди</button></div><br><br>
-                        </div>
-                        <hr/>
-                        <div>
-                            <button disabled style="opacity: 0.5;" class="btn btn-warning btn-lg btn-block" id="btnInsertNew">Внеси во попис нов</button>
-                        </div>
+                            <hr/>
+                            <div>
+                                <button disabled style="opacity: 0.5;" class="btn btn-warning btn-lg btn-block" id="btnInsertNew">Внеси во попис нов</button>
+                            </div>
                     </div>
                 </div>
-            </div> 
-            <div>
-                <div id="custom-dialog" style="display: none;margin-top:25px">
-                    <button id="btnLoad" class="btn btn-primary btn-lg btn-block">Вчитај фајл со средства од диск</button><br>
-                    <button id="btnLoadLocations"  class="btn btn-primary  btn-lg btn-block">Вчитај фајл со локации од диск</button><br>
-                    <button id="btnReview"  class="btn btn-primary  btn-lg btn-block">Прегледи</button><br>
-                    <button id="btnReset"  class="btn btn-primary  btn-lg btn-block">Ресетирај попис на ново</button><br>
-                    <button id="btnSaveOnDisk"  class="btn btn-primary  btn-lg btn-block">Запиши попис на диск</button><br>
-                    <button id="btnSretstva"  class="btn btn-primary  btn-lg btn-block">Основни Сретства</button><br>
-                    <button id="btnPopisNov"  class="btn btn-primary  btn-lg btn-block">Попис нов</button><br>
-                    <button id="btnClose"  class="btn btn-primary  btn-lg btn-block">Излез</button><br>
+            </div>
+            </div>
+            <div id="custom-dialog" style="display: none;position: absolute;z-index: 15;top: 10%;
+            left: 50%; margin: -100px 0 0 -205px;">
+            <div class="card-container" style="width: 410px;">
+                <div class="col card">
+                    <div class="card-content">
+                        <button id="btnLoad" class="btn btn-primary btn-lg btn-block">Вчитај фајл со средства од диск</button><br>
+                        <button id="btnLoadLocations"  class="btn btn-primary  btn-lg btn-block">Вчитај фајл со локации од диск</button><br>
+                        <button id="btnReview"  class="btn btn-primary  btn-lg btn-block">Прегледи</button><br>
+                        <button id="btnReset"  class="btn btn-primary  btn-lg btn-block">Ресетирај попис на ново</button><br>
+                        <button id="btnSaveOnDisk"  class="btn btn-primary  btn-lg btn-block">Запиши попис на диск</button><br>
+                        <button id="btnSretstva"  class="btn btn-primary  btn-lg btn-block">Основни Сретства</button><br>
+                        <button id="btnPopisNov"  class="btn btn-primary  btn-lg btn-block">Попис нов</button><br>
+                        <button id="btnClose"  class="btn btn-primary  btn-lg btn-block">Излез</button><br>
+                    </div>
                 </div>
             </div>
-            <div>
-                <div id="custom-dialogIsert" style="display: none;">
-                    <h3>Внес на ново сретство</h3>
+            </div>
+            <div id="custom-dialogIsert" style="display: none;position: absolute;z-index: 15;top: 20%;
+            left: 50%; margin: -100px 0 0 -205px;">
+            <div class="card-container" style="width: 410px;">
+                <div class="col card">
+                    <div class="card-content">
+                       <h3>Внес на ново сретство</h3>
                     <label>Артикл Шифра:</label>
                     <input class="form-control" type="text" name="shifra"  id="shifra"/>
                     <label>Назив</label>
                     <textarea id="naziv" class="form-control"></textarea><br>
                     <select id="lokacija" class="form-control">
                     </select><br>
-                    <button class="btn btn-primary" id="insertNew">Внеси во попис како ново</button>
-                    <button style="margin-top: 5px;" id="insertClose" class="btn btn-danger">Излез</button>
+                    <button class="btn btn-primary" id="insertNew">Внеси во попис како ново</button><br>
+                    <button id="insertClose" class="btn btn-danger">Излез</button>
                 </div>
+                    </div>
+                </div>
+            </div>
+            </div>
                 <div id="alertNaziv" style="display: none;position: absolute;z-index: 15;top: 35%;
              left: 50%; margin: -100px 0 0 -150px;">
              <div class="card-container" style="width: 300px;">
@@ -161,17 +176,17 @@
                 </div>
             </div>
             </div>
-            <div class="row card-container" id="Reviews" style="display: none;position:relative;right:5px">
-                <div class="col card">
-                    <div class="card-content">
+            <div class="row card-container" id="Reviews" style="display: none;position:relative;right:5px;width: 100%;">
+                <div class="col card" style="width: 100%">
+                    <div class="card-content" style="width: 100%">
                               <h3 id="yearReview"></h3>
                               <div class="containerSearch"> 
                                 <input type="text" id="searchVal" class="form-control" style="margin-left: 10px;" placeholder="Пребарување">
-                                <button class="btn btn-success" id="btnPorductSearch">Пребарај</button>   
-                                <button class="btn btn-warning" id="btnProductClear">Исчисти</button>
+                                <button class="btn btn-success" id="btnPorductSearch" style="margin-left: 8px;">Пребарај</button>   
+                                <button class="btn btn-warning" id="btnProductClear" style="margin-left: 8px;">Исчисти</button>
                               </div>
                         <hr/>
-                         <div class="table-responsive" style=" height:400px;overflow:auto;" id="tableProducts">
+                         <div class="table-responsive" style="overflow:auto;" id="tableProducts">
                             <table class="table table-striped" id="productsTable">
                                 <thead>
                                     <tr>
@@ -188,18 +203,18 @@
                     </div>
                 </div>
          </div>
-         <div class="row card-container" id="ReviewsNew" style="display: none;position:relative;right:5px">
-            <div class="col card">
-                <div class="card-content">
+         <div class="row card-container" id="ReviewsNew" style="display: none;position:relative;right:5px;width: 100%;">
+            <div class="col card" style="width: 100%">
+                <div class="card-content" style="width: 100%">
                     <div id="resultReviewsNew"></div>
                     <h3>Преглед - Попис нов Листа</h3>
                     <div class="containerSearch"> 
                         <input type="text" id="searchNewVal" class="form-control" style="margin-left: 10px;" placeholder="Пребарување">
-                        <button class="btn btn-success" id="btnPorductNewSearch">Пребарај</button>   
-                        <button class="btn btn-warning" id="btnProductNewClear">Исчисти</button>
+                        <button class="btn btn-success" id="btnPorductNewSearch" style="margin-left: 8px;">Пребарај</button>   
+                        <button class="btn btn-warning" id="btnProductNewClear" style="margin-left: 8px;">Исчисти</button>
                     </div>
                     <hr/>
-                     <div class="table-responsive" style=" height:400px;overflow:auto;">
+                     <div class="table-responsive" style="overflow:auto;">
                         <table class="table table-striped" id="productsNewTable">
                             <thead>
                                 <tr>
@@ -215,7 +230,7 @@
                               <tbody>
                              </tbody>
                          </table>
-                      </div>  
+                      </div> 
                     </div>
                 </div>
             </div>
