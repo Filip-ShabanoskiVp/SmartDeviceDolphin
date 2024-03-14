@@ -112,7 +112,7 @@ document.getElementById('closeScanError').addEventListener('click',function(){
     if(globalThis.products.length<=0){
 
         document.getElementById('result').innerHTML = `<p style='color:red'>Немате 
-        вчитано листа на основни сретства, пред да започнете со попис морате да вчитате
+        вчитано листа на основни средства, пред да започнете со попис морате да вчитате
         шифри на основни сретства !</p>`;
         document.getElementById("btnInsertNew").style.opacity = 0.5;
         document.getElementById("btnInsertNew").disabled = true;  
@@ -262,7 +262,7 @@ function readFileFromInternalStorage(type) {
                     globalThis.locations=[];
                 }
                 document.getElementById('result').innerHTML = 
-                `<p style='color:red'>Неуспешен вчитан формат на фајл</p>`;
+                `<p style='color:red'>Неуспешен вчитан формат на фајл!</p>`;
                  return;
                 }
             }
@@ -274,11 +274,11 @@ function readFileFromInternalStorage(type) {
     
                 globalThis.products=[];
                 document.getElementById('result').innerHTML = 
-                "<p style='color:red'>Неуспешно вчитан фајл од средства</p>"; 
+                "<p style='color:red'>Неуспешно вчитан фајл од средства!</p>"; 
             } else{
                 globalThis.locations=[];
                 document.getElementById('result').innerHTML = 
-                "<p style='color:red'>Неуспешно вчитан фајл од локации</p>";      
+                "<p style='color:red'>Неуспешно вчитан фајл од локации!</p>";      
             }
         }
         reader.readAsArrayBuffer(file);
@@ -309,11 +309,11 @@ function isUTF8Encoded(bytes) {
 
 function displayProducts(value=''){
 
-    document.getElementById('yearReview').innerText =  "Преглед - Пописна Листа од "+ globalThis.getYear + " година";
+    document.getElementById('yearReview').innerText =  "Преглед - Пописна листа од "+ globalThis.getYear + " година";
     if(globalThis.products.length>0){
         if(value!=''){
 
-            document.querySelector("#productsTable tbody").innerHTML = globalThis.products.filter(p=>p.code==value ||
+            document.querySelector("#productsTable tbody").innerHTML = globalThis.products.filter(p=>p.barcode==value ||
                  p.name.toLowerCase()==value.toLowerCase() ||
                    globalThis.locations.
                    find(location=>location.code == p.codeLocation).name.toLowerCase()==value.toLocaleLowerCase())
@@ -324,7 +324,7 @@ function displayProducts(value=''){
                 if(location) {
                     locationName = location.name;
                 }
-                return `<tr><td>${product.code}</td><td>${product.name}</td><td>${product.codeLocation=='000' ? 'Нема локација'
+                return `<tr><td>${product.barcode}</td><td>${product.name}</td><td>${product.codeLocation=='000' ? 'Нема локација'
                 : locationName}</td></tr>`;
              }).join('');
         }else {
@@ -334,7 +334,7 @@ function displayProducts(value=''){
                 if(location) {
                     locationName = location.name;
                 }
-                return `<tr><td>${product.code}</td><td>${product.name}</td><td>${product.codeLocation=='000' ? 'Нема локација'
+                return `<tr><td>${product.barcode}</td><td>${product.name}</td><td>${product.codeLocation=='000' ? 'Нема локација'
                 : locationName}</td></tr>`;
              }).join('');
         }
@@ -673,11 +673,10 @@ document.getElementById('btnYes').addEventListener('click',function(){
                     // alert(filename);
                   }, function(error){
                     // alert("Error resolving native path: " + JSON.stringify(error));
-                    fileError = "Погрешно избрана патека за датотеката";
+                    fileError = "Погрешно избрана патека за датотеката!";
                   });
                 window.resolveLocalFileSystemURI(uri, function(fileEntry){
                     fileEntry.file(function(file){  
-                            if(file.type === "text/plain"){
                                 var reader = new FileReader();
                                 reader.onloadend = function (evt) {
                     
@@ -694,110 +693,97 @@ document.getElementById('btnYes').addEventListener('click',function(){
                                    }
 
                                     if(isUTF8){
+                                                    content  = new TextDecoder("utf-8").decode(content);
+                            
+                                                    var lines = content.split('\n');
+                                                    
+                                                    lines.forEach(function (line) {
+                                                        line = line.trim()
                 
-                                    content  = new TextDecoder("utf-8").decode(content);
-                
-                                    var lines = content.split('\n');
-                                    
-                                    lines.forEach(function (line) {
-                                        line = line.trim()
-
-                                        if(type=='products'){ 
-                                            if(/^[^;]+;[^;]+;[^;]+;[^;]+;$/.test(line)){
-                                                line = line.split(";");
-                                            if(line[2]!=undefined){
-                                            globalThis.products.push({
-                                                code: line[0],
-                                                barcode: line[1],
-                                                name: line[2],
-                                                codeLocation: line[3]
-                                            });
-                                        }
-                                      }
-                                        } else{
-                                            if(/^[^;]+;[^;]+$/.test(line)){
-                                                line = line.split(";");
-                                                // if(line[1]!="..."){
-                                                    globalThis.locations.push({
-                                                        code: line[0],
-                                                        name: line[1],
-                                                    });
-                                                // }
-                                             }
-                                        }
-                                }   )
-                                if(type=='products'){
-                                    document.getElementById('result').innerHTML = ""; 
-                                    if(globalThis.products.length > 0){
-                                        if(fileError==""){
-                                        globalThis.getYear = filename.substring(filename.lastIndexOf("_")+1,filename.lastIndexOf("."));
-                                        // alert(globalThis.getYear);
-                                        document.getElementById('result').innerHTML = 
-                                        "<p style='color:green'>Успечно вчитан фајл од средства од  "+ globalThis.getYear +" година</p>";
-                                        } else{
+                                                        if(type=='products'){ 
+                                                            if(/^[^;]+;[^;]+;[^;]+;[^;]+;$/.test(line)){
+                                                                line = line.split(";");
+                                                            if(line[2]!=undefined){
+                                                            globalThis.products.push({
+                                                                code: line[0],
+                                                                barcode: line[1],
+                                                                name: line[2],
+                                                                codeLocation: line[3]
+                                                            });
+                                                        }
+                                                    }
+                                                        } else{
+                                                            if(/^[^;]+;[^;]+$/.test(line)){
+                                                                line = line.split(";");
+                                                                // if(line[1]!="..."){
+                                                                    globalThis.locations.push({
+                                                                        code: line[0],
+                                                                        name: line[1],
+                                                                    });
+                                                                // }
+                                                            }
+                                                        }
+                                                }  
+                                                )
+                                                if(type=='products'){
+                                                    document.getElementById('result').innerHTML = ""; 
+                                                    if(globalThis.products.length > 0){
+                                                        if(fileError==""){
+                                                        globalThis.getYear = filename.substring(filename.lastIndexOf("_")+1,filename.lastIndexOf("."));
+                                                        // alert(globalThis.getYear);
+                                                        document.getElementById('result').innerHTML = 
+                                                        "<p style='color:green'>Успечно вчитан фајл од средства од  "+ globalThis.getYear +" година</p>";
+                                                        } else{
+                                                            globalThis.products=[];
+                                                            document.getElementById('result').innerHTML = "<p style='color:red'>" + fileError + "</p>"    
+                                                        }
+                                                    } else {
+                                                        document.getElementById('result').innerHTML = 
+                                                    "<p style='color:red'>Вчитан е не соодветен формат на фајл!</p>";
+                                                    }
+                                                }else{
+                                                    document.getElementById('result').innerHTML = ""; 
+                                                    if(globalThis.locations.length > 0){
+                                                        if(fileError==""){
+                                                        globalThis.getYear = filename.substring(filename.lastIndexOf("_")+1,filename.lastIndexOf("."));
+                                                        // alert(globalThis.getYear);
+                                                        document.getElementById('result').innerHTML = 
+                                                        "<p style='color:green'>Успечно вчитан фајл од локации од "+ globalThis.getYear +" година</p>";
+                                                        }else{
+                                                            globalThis.locations=[];
+                                                            document.getElementById('result').innerHTML = "<p style='color:red'>" + fileError + "</p>"
+                                                        }
+                                                    } else {
+                                                        document.getElementById('result').innerHTML = 
+                                                        "<p style='color:red'>Вчитан е не соодветен формат на фајл!</p>";  
+                                                    }
+                                                }                                  
+                                    }else{
+                                        if(type=='products'){
+                                            document.getElementById("btnInsertNew").style.opacity = 0.5;
+                                            document.getElementById("btnInsertNew").disabled = true; 
+                            
                                             globalThis.products=[];
-                                            document.getElementById('result').innerHTML = "<p style='color:red'>" + fileError + "</p>"    
-                                        }
-                                    } else {
-                                        document.getElementById('result').innerHTML = 
-                                    "<p style='color:red'>Вчитан е не соодветен фајл!</p>";
-                                    }
-                                }else{
-                                    document.getElementById('result').innerHTML = ""; 
-                                    if(globalThis.locations.length > 0){
-                                        if(fileError==""){
-                                        globalThis.getYear = filename.substring(filename.lastIndexOf("_")+1,filename.lastIndexOf("."));
-                                        // alert(globalThis.getYear);
-                                        document.getElementById('result').innerHTML = 
-                                        "<p style='color:green'>Успечно вчитан фајл од локации од "+ globalThis.getYear +" година</p>";
-                                        }else{
+                                        } else {
                                             globalThis.locations=[];
-                                            document.getElementById('result').innerHTML = "<p style='color:red'>" + fileError + "</p>"
                                         }
-                                    } else {
                                         document.getElementById('result').innerHTML = 
-                                        "<p style='color:red'>Вчитан е не соодветен фајл!</p>";  
+                                        `<p style='color:red'>Вчитан е фајл со не соодветно кодирање!</p>`;
+                                        return;
+                                        }
                                     }
-                                }
-                        }else{
-                            if(type=='products'){
-                                document.getElementById("btnInsertNew").style.opacity = 0.5;
-                                document.getElementById("btnInsertNew").disabled = true; 
-                
-                                globalThis.products=[];
-                            } else {
-                                globalThis.locations=[];
-                            }
-                            document.getElementById('result').innerHTML = 
-                            `<p style='color:red'>Неуспешен вчитан формат на фајл</p>`;
-                             return;
-                            }
-                        }
-                        reader.readAsArrayBuffer(file);
-                    }else{
-                        if(type=='products'){
-                            document.getElementById("btnInsertNew").style.opacity = 0.5;
-                            document.getElementById("btnInsertNew").disabled = true; 
-                
-                            globalThis.products=[];
-                            document.getElementById('result').innerHTML = 
-                            "<p style='color:red'>Неуспешно вчитан фајл од средства</p>"; 
-                        } else{
-                            globalThis.locations=[];
-                            document.getElementById('result').innerHTML = 
-                            "<p style='color:red'>Неуспешно вчитан фајл од локации</p>";      
-                        }
-                    }
+                                    reader.readAsArrayBuffer(file);
                     }, function(error){
                         alert(error);
                     })
-                }, function(error){
-                    alert(error)
-                }, function(){
-                    alert(error)
-                });
+                },
+                function(error){
+                    alert(error)           
              })
-            }
+            }, function(error){
+                alert(error)
+            })
+        }
 
     document.getElementById('btnSaveOnDisk').addEventListener('click', function() {
         if(globalThis.newProductArray.length>0){
@@ -840,7 +826,7 @@ function writeFile(){
               //      alert("Failed to save file.");
               //  };
               var lines = [];
-              lines.push("Код средство, Баркод, Назив средство, Код локација, Назив локација, Датум и време");
+              lines.push("Код, Баркод, Назив средство, Код локација, Назив локација, Датум и време");
               globalThis.newProductArray.forEach(function(line){
                 
             var locationName
@@ -850,7 +836,7 @@ function writeFile(){
             }
 
             var myLocation = line.codeLocation=='000' ? 'Нема локација' + ", " : line.codeLocation + ", " + locationName + ", ";
-            lines.push((line.code+", "+line.barcode+", "+line.name + ", " + myLocation
+            lines.push((line.code + ", " + line.barcode+", "+line.name + ", " + myLocation
                  + line.dateTimesString).toString());
               });
               var data = lines.join('\n');
@@ -920,7 +906,7 @@ function displayNewProducts(value='') {
                 const productName = (product.name || '').toString().toLowerCase();
                 const locationName = globalThis.locations.find(location => location.code == product.codeLocation)?.name.toLowerCase() || '';
                 return (
-                    product.code == value || 
+                    product.barcode == value || 
                     productName.includes(value.toLowerCase()) || 
                     locationName.includes(value.toLowerCase())
                 );
@@ -938,7 +924,7 @@ function displayNewProducts(value='') {
                 }
 
                 return `<tr>
-                    <td>${product.code.toString()}</td>
+                    <td>${product.barcode.toString()}</td>
                     <td>${product.name}</td>
                     <td>${product.codeLocation == '000' ? 'Нема локација' : product.codeLocation }</td>
                     <td>${product.codeLocation == '000' && locationName === '...' ? 'Нема локација' : locationName}</td>
@@ -959,7 +945,7 @@ function displayNewProducts(value='') {
                 }
 
                 return `<tr>
-                    <td>${product.code.toString()}</td>
+                    <td>${product.barcode.toString()}</td>
                     <td>${product.name}</td>
                     <td>${product.codeLocation == '000' ? 'Нема локација' : product.codeLocation }</td>
                     <td>${locationName === '...' ? 'Нема локација' : locationName}</td>
@@ -1016,6 +1002,9 @@ function UpdateLocation(selectedCode, row){
 
         var rowIndex = Array.from(row.parentNode.children).indexOf(row); // Get the index of the row
         globalThis.newProductArray[rowIndex].codeLocation = selectedLocation.code;
+
+        document.getElementById('resultReviewsNew').innerHTML = `<p style='color:orange'>Променета е локацијата на
+         пописот со назив: ${globalThis.newProductArray[rowIndex].name}</p>`;
     } 
 }
 
@@ -1059,7 +1048,7 @@ document.getElementById('btnNoDelete').addEventListener('click',function(){
         document.getElementById("menuToShow").style.display = "block";
         document.getElementById('ReviewsNew').style.display = "block";
         document.getElementById('resultReviewsNew').innerHTML = `<p style='color:green'>Пописот ${product.name} 
-    е избришан од листата на нов попис!</p>`;
+    е избришан од новата пописна листа!</p>`;
     globalThis.codeToDelete=undefined;
     displayNewProducts()
     }

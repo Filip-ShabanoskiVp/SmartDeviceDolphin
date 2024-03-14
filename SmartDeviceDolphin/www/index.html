@@ -49,7 +49,7 @@
             <div class="card-container" style="width: 410px;">
                 <div class="col card">
                     <div class="card-content">
-                        <h3>Основни Сретства</h1>
+                        <h3>Основни Средства</h1>
                             <hr/>
                             <form>
                                 <label>Баркод / Шифра на Сретства:</label> 
@@ -65,7 +65,7 @@
                             </div>
                             <hr/>
                             <div>
-                                <button disabled style="opacity: 0.5;" class="btn btn-warning btn-lg btn-block" id="btnInsertNew">Внеси во попис нов</button>
+                                <button disabled style="opacity: 0.5;" class="btn btn-warning btn-lg btn-block" id="btnInsertNew">Внеси ново средство</button>
                             </div>
                     </div>
                 </div>
@@ -81,8 +81,8 @@
                         <button id="btnReview"  class="btn btn-primary  btn-lg btn-block">Прегледи</button><br>
                         <button id="btnReset"  class="btn btn-primary  btn-lg btn-block">Ресетирај попис на ново</button><br>
                         <button id="btnSaveOnDisk"  class="btn btn-primary  btn-lg btn-block">Запиши попис на диск</button><br>
-                        <button id="btnSretstva"  class="btn btn-primary  btn-lg btn-block">Основни Сретства</button><br>
-                        <button id="btnPopisNov"  class="btn btn-primary  btn-lg btn-block">Попис нов</button><br>
+                        <button id="btnSretstva"  class="btn btn-primary  btn-lg btn-block">Основни средства</button><br>
+                        <button id="btnPopisNov"  class="btn btn-primary  btn-lg btn-block">Нов попис</button><br>
                         <button id="btnClose"  class="btn btn-primary  btn-lg btn-block">Излез</button><br>
                     </div>
                 </div>
@@ -93,11 +93,12 @@
             <div class="card-container" style="width: 410px;">
                 <div class="col card">
                     <div class="card-content">
-                       <h3>Внес на ново сретство</h3>
+                       <h3>Внес на ново средство</h3>
                     <label>Артикл Шифра:</label>
                     <input class="form-control" type="text" name="shifra"  id="shifra"/>
                     <label>Назив</label>
                     <textarea id="naziv" class="form-control"></textarea><br>
+                    <label>Локација</label>
                     <select id="lokacija" class="form-control">
                     </select><br>
                     <button class="btn btn-primary" id="insertNew">Внеси во попис како ново</button><br>
@@ -207,7 +208,7 @@
             <div class="col card" style="width: 100%">
                 <div class="card-content" style="width: 100%">
                     <div id="resultReviewsNew"></div>
-                    <h3>Преглед - Попис нов Листа</h3>
+                    <h3>Преглед - Нова пописна листа</h3>
                     <div class="containerSearch"> 
                         <input type="text" id="searchNewVal" class="form-control" style="margin-left: 10px;" placeholder="Пребарување">
                         <button class="btn btn-success" id="btnPorductNewSearch" style="margin-left: 8px;">Пребарај</button>   
@@ -221,9 +222,9 @@
                                     <th>Шифра</th>
                                     <th>Назив</th>
                                     <th>Локација код</th>
-                                    <th>Локација Назив</th>
+                                    <th>Локација назив</th>
                                     <th>Датум</th>
-                                    <th>Промени Локација</th>
+                                    <th>Промени локација</th>
                                     <th>Избриши</th>
                                 </tr>
                              </thead>
